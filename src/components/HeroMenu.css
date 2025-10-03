@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Bytesized&display=swap');
+
+.HeroBar {
+    background-color: black;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.HeroTitle {
+    font-family: "Bytesized", sans-serif;
+}
+
