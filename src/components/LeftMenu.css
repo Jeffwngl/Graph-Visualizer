@@ -1,0 +1,27 @@
+.LeftMenu {
+    width: 40px;
+    background-color: black;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Toggle {
+    width: 30px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.ToggleContainer {
+  position: fixed;
+  background-color: black;
+  left: 40px;
+  width: 100x;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0px 10px 10px 0px;
+  gap: 10px;
+}
