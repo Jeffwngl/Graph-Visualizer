@@ -7,8 +7,13 @@
     padding: 10px;
 }
 
+.BottomBar p {
+    font-size: small;
+}
+
 .BottomBar a {
     color: white;
+    font-size: small;
 }
 
 .BottomSpeed {
@@ -22,14 +27,18 @@
     height: 40px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
 }
 
 .BottomControls button {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
-    width: 40px;
+    padding: 4px;
+    width: 30px;
     cursor: pointer;
+}
+
+.Progress {
+    width: 20vw;
 }

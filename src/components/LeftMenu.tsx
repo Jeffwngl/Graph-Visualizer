@@ -1,23 +1,19 @@
 import { useState } from 'react'
 import './LeftMenu.css'
 import ToggleMenuLeft from './ToggleMenuLeft';
+import { RightArrowIcon, LeftArrowIcon } from '../assets/Icons';
 
 export default function LeftMenu() {
     const [isOpen, setIsOpen] = useState(false);
 
-    const toggleLeftMenu = () => {
-        setIsOpen(!isOpen);
-    }
-
     return (
-        <div className='LeftMenu'>
-            <button className='Toggle' id='toggle' onClick={toggleLeftMenu}>{isOpen ? "-" : "+" }</button>
-            {isOpen ? 
-            <div className={`ToggleContainer`}>
-                <ToggleMenuLeft />
-            </div> 
-            : <></>
-            }
+        <div className={`LeftMenu ${isOpen ? "open" : "closed"}`}>
+            <button className='ToggleLeft' id='toggleleft' onClick={() => setIsOpen(!isOpen)}>{isOpen ? <LeftArrowIcon /> : <RightArrowIcon /> }</button>
+            {isOpen && (
+                <div className={`ToggleContainer`}>
+                    <ToggleMenuLeft />
+                </div> 
+            )}
         </div>
     )
 }

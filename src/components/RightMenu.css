@@ -1,0 +1,30 @@
+.RightMenu {
+    position: relative;
+    background-color: black;
+    color: white;
+    width: 400px;
+    height: 400px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.RightMenu.open .StepsMenu {
+    height: 100%;
+    width: 100%;
+}
+
+.RightMenu.closed {
+  width: 40px;
+}
+
+.ToggleRight {
+    width: 40px;
+    height: 100px;
+    border: none;
+}
+
+.ToggleRight:hover {
+  background-color: #c54c67;
+}

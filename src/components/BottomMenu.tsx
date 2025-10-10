@@ -9,10 +9,6 @@ export default function BottomMenu() {
         setIsPlaying(!isPlaying);
     }
 
-    function switchIcon() {
-
-    }
-
     return (
         <div className="BottomBar">
             <div className="BottomSpeed">
@@ -39,6 +35,7 @@ export default function BottomMenu() {
                 <button id="skip">
                     <SkipIcon />
                 </button>
+                <input className="Progress" type="range"></input>
             </div>
             <div className="BottomLinks">
                 <a href="https://github.com/Jeffwngl/Graph-Visualizer">Contribute</a>
