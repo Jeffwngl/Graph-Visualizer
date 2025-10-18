@@ -4,17 +4,14 @@ type Vertex = {
     id: string;
     x: number;
     y: number;
-    visited: boolean;
-    neighbours: string[];
+    visited?: boolean;
+    neighbours?: string[];
 }
 
 type Edge = {
     from: string;
     to: string;
 }
-
-const [vertices, setVertices] = useState<Vertex[]>([]);
-const [edges, setEdges] = useState<Edge[]>([]);
 
 // Canvas Functions
 
@@ -25,11 +22,13 @@ function zoomCamera() {
 // Canvas Component
 
 export default function Canvas() {
+    const [vertices, setVertices] = useState<Vertex[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
+
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    const draw = (ctx: CanvasRenderingContext2D) => {
-        console.log("drawing")
+    const draw = (ctx: CanvasRenderingContext2D) => { // test function
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.fillStyle = '#000000ff';
         ctx.beginPath()
@@ -37,11 +36,25 @@ export default function Canvas() {
         ctx.fill()
     }
 
+    const drawVertex = (ctx: CanvasRenderingContext2D, v: Vertex) => {
+            ctx.beginPath();
+            ctx.arc(v.x, v.y, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = v.visited ? "#ba1212ff" : "#000000ff";
+            ctx.fill();
+            ctx.strokeStyle = "#1e3a8a";
+            ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(v.id, v.x, v.y);
+    }
+
     const addVertex = (e: React.MouseEvent) => {
         const canvas = canvasRef.current!.getBoundingClientRect();
         const x = e.clientX - canvas.left;
         const y = e.clientY - canvas.top;
-        setVertices(prev => )
+        setVertices(prev => [...prev, { id: `${prev.length + 1}`, x, y, neighbours: [] }]);
+        // console.log(vertices[vertices.length - 1]);
     }
 
     useEffect(() => {
@@ -56,8 +69,14 @@ export default function Canvas() {
             return;
         }
 
-        draw(context);
-    }, [draw]);
+        // draw vertices
+        vertices.forEach(v => {
+            drawVertex(context, v);
+        });
+
+        // draw edges
+
+    }, [vertices]);
 
 
 
@@ -73,7 +92,8 @@ export default function Canvas() {
                 width: "100%",
                 height: "100%",
                 zIndex: 0,
-            }}>
+            }}
+            onClick={(e) => addVertex(e)}>
             Use a browser that can use HTML Canvas.
         </canvas>
     )
