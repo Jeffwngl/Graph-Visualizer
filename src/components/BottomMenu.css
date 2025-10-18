@@ -5,6 +5,7 @@
     align-items: center;
     background-color: black;
     padding: 10px;
+    z-index: 1;
 }
 
 .BottomBar p {

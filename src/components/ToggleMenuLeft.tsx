@@ -12,8 +12,13 @@ export default function ToggleMenuLeft() {
     return (
         <>
             <button className="MenuButton" id="addGraph">Add New Graph</button>
-            <button className="MenuButton" id="editGraph" onClick={() => setEditOpen(true)}>Edit Graph</button>
-            <EditGraph showPopUp={editOpen} closePopUp={() => setEditOpen(false)}></EditGraph>
+            <button className="MenuButton" id="editGraph" onClick={() => {
+                setEditOpen(true);
+                }}>Edit Graph</button>
+            <EditGraph showPopUp={editOpen} closePopUp={() => {
+                setEditOpen(false);
+                }} 
+            />
             <button className="MenuButton" id="importGraph" onClick={() => setImportOpen(true)}>Import Graph</button>
             <ImportGraph showPopUp={importOpen} closePopUp={() => setImportOpen(false)}></ImportGraph>
             <button className="MenuButton" id="dfs">DFS</button>

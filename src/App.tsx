@@ -5,6 +5,7 @@ import HeroMenu from './components/HeroMenu'
 import BottomMenu from './components/BottomMenu'
 import LeftMenu from './components/LeftMenu'
 import RightMenu from './components/RightMenu'
+import Canvas from './components/Canvas'
 // import Vertex from './components/Vertex'
 // import Edge from './components/Edge'
 
@@ -15,6 +16,7 @@ function App() {
       <HeroMenu />
       <div className='Main'>
         <LeftMenu />
+        <Canvas />
         <RightMenu />
       </div>
       <BottomMenu />
