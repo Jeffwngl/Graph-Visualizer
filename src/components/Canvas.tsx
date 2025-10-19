@@ -53,6 +53,14 @@ export default function Canvas() {
         const canvas = canvasRef.current!.getBoundingClientRect();
         const x = e.clientX - canvas.left;
         const y = e.clientY - canvas.top;
+        for (let i = 0; i < vertices.length; i++) {
+            if ((vertices[i].x - 20 <= x) && 
+                (x <= vertices[i].x + 20) && 
+                (vertices[i].y - 20 <= y) && 
+                (y <= vertices[i].y + 20)) {
+                return;
+            };
+        }
         setVertices(prev => [...prev, { id: `${prev.length + 1}`, x, y, neighbours: [] }]);
         // console.log(vertices[vertices.length - 1]);
     }
