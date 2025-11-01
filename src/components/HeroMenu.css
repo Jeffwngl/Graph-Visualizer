@@ -2,7 +2,8 @@
 
 .HeroBar {
     background-color: black;
-    padding: 10px;
+    height: 70px;
+    padding-left: 20px;
     display: flex;
     align-items: center;
     gap: 20px;

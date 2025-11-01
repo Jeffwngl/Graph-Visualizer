@@ -13,15 +13,19 @@ type Edge = {
     to: string;
 }
 
+type canvasProps = {
+    editing: boolean;
+}
+
 // Canvas Functions
 
 function zoomCamera() {
-
+    // to implement
 }
 
 // Canvas Component
 
-export default function Canvas() {
+export default function Canvas({editing}: canvasProps) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
 
@@ -47,13 +51,18 @@ export default function Canvas() {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(v.id, v.x, v.y);
+            
     }
 
-    const addVertex = (e: React.MouseEvent) => {
+    const addVertex = (e: React.MouseEvent, editing: boolean) => {
+        console.log(editing);
+        if (!editing) {
+            return;
+        }
         const canvas = canvasRef.current!.getBoundingClientRect();
         const x = e.clientX - canvas.left;
         const y = e.clientY - canvas.top;
-        for (let i = 0; i < vertices.length; i++) {
+        for (let i = 0; i < vertices.length; i++) { // stop being able to place nodes above eachother
             if ((vertices[i].x - 20 <= x) && 
                 (x <= vertices[i].x + 20) && 
                 (vertices[i].y - 20 <= y) && 
@@ -62,7 +71,6 @@ export default function Canvas() {
             };
         }
         setVertices(prev => [...prev, { id: `${prev.length + 1}`, x, y, neighbours: [] }]);
-        // console.log(vertices[vertices.length - 1]);
     }
 
     useEffect(() => {
@@ -92,16 +100,16 @@ export default function Canvas() {
         <canvas 
             ref={canvasRef} 
             width={window.innerWidth} 
-            height={window.innerHeight}
+            height={window.innerHeight - 190}
             style={{
                 position: "absolute",
-                top: 0,
+                top: 120,
                 left: 0,
                 width: "100%",
-                height: "100%",
+                height: "calc(100% - 190px)",
                 zIndex: 0,
             }}
-            onClick={(e) => addVertex(e)}>
+            onClick={(e) => addVertex(e, editing)}>
             Use a browser that can use HTML Canvas.
         </canvas>
     )

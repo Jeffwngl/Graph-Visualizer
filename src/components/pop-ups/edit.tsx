@@ -1,14 +1,14 @@
 import './edit.css'
 
-export default function EditGraph({showPopUp, closePopUp} : {showPopUp: boolean, closePopUp: () => void}) {
-    if (!showPopUp) {
-        return null;
-    }
+export default function EditGraph({closePopUp} : {closePopUp: () => void}) {
 
     return (
         <div className="EditGraph">
-            <button onClick={closePopUp}>Close</button>
-            <p>Edit Graph</p>
+            <button id="editCloseButton" onClick={ () => {
+                closePopUp();
+            }}>Close</button>
+            <p>To Create - Click to place Vertices.</p>
+            <p>To Join - Click and drag to create edges between vertices.</p>
         </div>
     )
 }
