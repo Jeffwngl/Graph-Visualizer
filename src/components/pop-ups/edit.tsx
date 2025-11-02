@@ -6,7 +6,7 @@ export default function EditGraph({closePopUp} : {closePopUp: () => void}) {
         <div className="EditGraph">
             <button id="editCloseButton" onClick={ () => {
                 closePopUp();
-            }}>Close</button>
+            }}>Stop Editing</button>
             <p>To Create - Click to place Vertices.</p>
             <p>To Join - Click and drag to create edges between vertices.</p>
         </div>

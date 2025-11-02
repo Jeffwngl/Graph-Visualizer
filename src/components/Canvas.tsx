@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Vertex = {
     id: string;
@@ -51,11 +51,36 @@ export default function Canvas({editing}: canvasProps) {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(v.id, v.x, v.y);
-            
+    }
+
+    const drawEdgeFollowMouse = (ctx: CanvasRenderingContext2D, e: Edge, x: number, y: number) => {
+        ctx.beginPath();
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+
+    const addEdge = (e: React.MouseEvent, editing: boolean) => {
+        console.log(`Editing: ${editing}`);
+        if (!editing) {
+            return;
+        }
+        const canvas = canvasRef.current!.getBoundingClientRect();
+        const x = e.clientX - canvas.left;
+        const y = e.clientY - canvas.right;
+
+        for (let i = 0; i < vertices.length; i++) {
+                        if ((vertices[i].x - 20 <= x) && 
+                (x <= vertices[i].x + 20) && 
+                (vertices[i].y - 20 <= y) && 
+                (y <= vertices[i].y + 20)) {
+                // change adjacency matrix or array
+                break
+            };
+        }
     }
 
     const addVertex = (e: React.MouseEvent, editing: boolean) => {
-        console.log(editing);
+        console.log(`Editing: ${editing}`);
         if (!editing) {
             return;
         }
@@ -94,6 +119,10 @@ export default function Canvas({editing}: canvasProps) {
 
     }, [vertices]);
 
+    // make edges follow cursor before placed (Double check to use useEffect or not)
+    useEffect(() => {
+
+    })
 
 
     return (
