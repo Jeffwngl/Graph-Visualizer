@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import EditGraph from "./pop-ups/edit";
 
 type Vertex = {
     id: string;
@@ -15,6 +16,7 @@ type Edge = {
 
 type canvasProps = {
     editing: boolean;
+    setEdit: () => void;
 }
 
 // Canvas Functions
@@ -25,14 +27,14 @@ function zoomCamera() {
 
 // Canvas Component
 
-export default function Canvas({editing}: canvasProps) {
+export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
 
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    const draw = (ctx: CanvasRenderingContext2D) => { // test function
+    const draw = (ctx: CanvasRenderingContext2D) => { // DEBUG TEST FUNCTION
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.fillStyle = '#000000ff';
         ctx.beginPath()
@@ -53,14 +55,13 @@ export default function Canvas({editing}: canvasProps) {
             ctx.fillText(v.id, v.x, v.y);
     }
 
-    const drawEdgeFollowMouse = (ctx: CanvasRenderingContext2D, e: Edge, x: number, y: number) => {
+    const drawEdgeFollowMouse = (ctx: CanvasRenderingContext2D, e: Edge, x: number, y: number) => { // IN PROGRESS
         ctx.beginPath();
         ctx.lineTo(x, y);
         ctx.stroke();
     }
 
-    const addEdge = (e: React.MouseEvent, editing: boolean) => {
-        console.log(`Editing: ${editing}`);
+    const addEdge = (e: React.MouseEvent, editing: boolean) => { // IN PROGRESS
         if (!editing) {
             return;
         }
@@ -69,7 +70,7 @@ export default function Canvas({editing}: canvasProps) {
         const y = e.clientY - canvas.right;
 
         for (let i = 0; i < vertices.length; i++) {
-                        if ((vertices[i].x - 20 <= x) && 
+                if ((vertices[i].x - 20 <= x) && 
                 (x <= vertices[i].x + 20) && 
                 (vertices[i].y - 20 <= y) && 
                 (y <= vertices[i].y + 20)) {
@@ -77,6 +78,25 @@ export default function Canvas({editing}: canvasProps) {
                 break
             };
         }
+    }
+
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+            console.log("Error: Canvas Element not Found.");
+            return;
+        }
+        const context = canvas.getContext('2d');
+        if (!context) {
+            console.log("Error: Not Able to get Canvas Context.");
+            return;
+        }
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        setVertices([]);
+        console.log("Cleared Canvas");
+        // for (let i = 0; i < vertices.length; i++) {
+        //     console.log(vertices[i].id);
+        // }
     }
 
     const addVertex = (e: React.MouseEvent, editing: boolean) => {
@@ -120,12 +140,19 @@ export default function Canvas({editing}: canvasProps) {
     }, [vertices]);
 
     // make edges follow cursor before placed (Double check to use useEffect or not)
-    useEffect(() => {
+    useEffect(() => { // IN PROGRESS
 
-    })
+    }, [edges])
 
 
     return (
+        <>
+        {editing && (
+            <EditGraph 
+            closePopUp={ setEdit }
+            clearCanvas={ clearCanvas }
+            />
+        )}
         <canvas 
             ref={canvasRef} 
             width={window.innerWidth} 
@@ -141,5 +168,6 @@ export default function Canvas({editing}: canvasProps) {
             onClick={(e) => addVertex(e, editing)}>
             Use a browser that can use HTML Canvas.
         </canvas>
+        </>
     )
 }

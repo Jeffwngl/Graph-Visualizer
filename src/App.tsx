@@ -22,12 +22,10 @@ function App() {
         <LeftMenu 
           editOnToggle={ () => setIsEditing(true) }
         />
-        {isEditing && (
-          <EditGraph 
-            closePopUp={ () => setIsEditing(false) }
-          />
-        )}
-        <Canvas editing={ isEditing }/>
+        <Canvas 
+          editing={ isEditing }
+          setEdit={ () => setIsEditing(false) }
+        />
         <RightMenu />
       </div>
       <BottomMenu />
