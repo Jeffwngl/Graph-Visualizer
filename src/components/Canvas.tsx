@@ -55,6 +55,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         ctx.fillStyle = v.visited ? "#ba1212ff" : "#000000ff";
         ctx.fill();
         ctx.strokeStyle = "#1e3a8a";
+        ctx.lineWidth = 3;
         ctx.stroke();
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
@@ -89,8 +90,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             return;
         }
         context.clearRect(0, 0, canvas.width, canvas.height);
-        setVertices([]);
-        console.log("Cleared Canvas");
     }
 
     /* ------------------------------ Not in use ------------------------------ */
@@ -124,20 +123,25 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
 
     /* ------------------------------ Main canvas inputs ------------------------------ */
 
-    const canvas = canvasRef.current;
-    if (!canvas) {
-        console.log("Error: Canvas Element not Found.");
-        return;
-    };
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.log("Error: Not Able to get Canvas Context.");
-        return;
-    };
+    // const canvas = canvasRef.current;
+    // if (!canvas) {
+    //     console.log("Error: Canvas Element not Found.");
+    //     return;
+    // };
+    // const ctx = canvas.getContext('2d');
+    // if (!ctx) {
+    //     console.log("Error: Not Able to get Canvas Context.");
+    //     return;
+    // };
 
     useEffect(() => {
         drawCanvas();
     }, [vertices, edges, tempEdge]);
+
+    const eraseNodes = () => {
+        setEdges([]);
+        setVertices([]);
+    }
 
     const drawCanvas = () => {
         const canvas = canvasRef.current;
@@ -187,6 +191,15 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     /* ------------------------------ Mouse handle inputs ------------------------------ */
 
     const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>): MousePosition => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+            console.log("Error: Canvas Element not Found.");
+            return {
+                x: 0,
+                y: 0
+            };
+        };
+
         const rec = canvas.getBoundingClientRect();
         return {
             x: e.clientX - rec.left,
@@ -217,15 +230,13 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                     edgeId: vertices[i].id,
                     startX: vertices[i].x,
                     startY: vertices[i].y
+
                 });
                 return;
             } 
-            else {
-                addVertex(pos.x, pos.y);
-            }
-
             // check for if move mode is toggled and set dragged node (TOADD)
         };
+        addVertex(pos.x, pos.y);
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -246,9 +257,9 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     // check for mouse lifted up
     const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (connectingStart) {   
-        // const pos = getMousePos(e);
+            const pos = getMousePos(e);
             for (let i = 0; i < vertices.length; i++) {
-                if (vertices[i].id != connectingStart.edgeId) {
+                if (vertices[i].id != connectingStart.edgeId && checkInVertex(vertices[i], pos.x, pos.y)) {
                     addEdge(connectingStart.edgeId, vertices[i].id);
                     break;
                     };
@@ -299,10 +310,13 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             neighbours: []
         };
         setVertices([...vertices, newVertex]);
+        console.log("vertex added: " + vertices[vertices.length - 1].id);
     };
 
     const addEdge = (fromId: string, toId: string) => {
         setEdges(prev => [...prev, { from: fromId, to: toId }]);
+        console.log("edge from: " + fromId)
+        console.log("edge to: " + toId)
     };
 
     return (
@@ -310,7 +324,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         {editing && (
             <EditGraph 
             closePopUp={ setEdit }
-            clearCanvas={ clearCanvas }
+            clearCanvas={ eraseNodes }
             />
         )}
         <canvas 
