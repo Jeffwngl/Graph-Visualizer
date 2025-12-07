@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import EditGraph from "./pop-ups/edit";
+import Vertex from "./graph-components/Vertex";
 
 type Vertex = {
     id: string;
+    width: number;
     x: number;
     y: number;
     visited?: boolean;
@@ -14,36 +16,38 @@ type Edge = {
     to: string;
 }
 
+interface connectionStart {
+    edgeId: string;
+    startX: number;
+    startY: number;
+}
+
+interface MousePosition {
+    x: number;
+    y: number;
+}
+
+interface tempEdge {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+}
+
 type canvasProps = {
     editing: boolean;
     setEdit: () => void;
-    
 }
-
-// Canvas Functions
-
-function zoomCamera() {
-    // to implement
-}
-
-// Canvas Component
 
 export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
-    const [drawingEdge, setDrawingEdge] = useState(false);
-    const [drawFromPos, setDrawFromPos] = useState({x: 0, y: 0})
-
+    const [connectingStart, setConnectingStart] = useState<connectionStart | null>(null);
+    const [tempEdge, setTempEdge] = useState<tempEdge | null>(null);
+    // const [mouseLoc, setMouseLoc] = useState<MousePosition>({x: 0, y: 0})
+    // const [draggedNode, setDraggedNode] = useState<string | null>(null);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-    // const draw = (ctx: CanvasRenderingContext2D) => { // DEBUG TEST FUNCTION
-    //     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    //     ctx.fillStyle = '#000000ff';
-    //     ctx.beginPath()
-    //     ctx.arc(50, 100, 20, 0, 2*Math.PI)
-    //     ctx.fill()
-    // }
 
     const drawVertex = (ctx: CanvasRenderingContext2D, v: Vertex) => {
         ctx.beginPath();
@@ -57,6 +61,21 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         ctx.textBaseline = "middle";
         ctx.fillText(v.id, v.x, v.y);
     }
+
+    const drawEdge = (
+            ctx: CanvasRenderingContext2D,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number
+        ) => {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+    };
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
@@ -74,13 +93,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         console.log("Cleared Canvas");
     }
 
-    /* ------------------------------ Edges and Vertices ------------------------------ */
-
-    // function Edge(x: number, y: number) {
-    //     this.x = x;
-    //     this.y = y;
-
-    // }
+    /* ------------------------------ Not in use ------------------------------ */
 
     const getCanvasPos = (e: React.MouseEvent) => {
         const canvas = canvasRef.current!.getBoundingClientRect();
@@ -92,182 +105,205 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         };
     };
     
-    const getCanvasContext = () => {
+    const getCanvasContext = () => { // not in use
         const canvas = canvasRef.current;
         if (!canvas) {
             console.log("Error: Canvas Element not Found.");
             return;
-        }
+        };
 
         const context = canvas.getContext('2d');
         if (!context) {
             console.log("Error: Not Able to get Canvas Context.");
             return;
-        }
+        };
         return {
             context
-        }
-    }
+        };
+    };
 
-    const drawEdgeFollowMouse = (x: number, y: number) => { // IN PROGRESS
-        console.log(drawingEdge);
-        if (!drawingEdge || !editing) {
-            return;
-        }
-        const canvas = canvasRef.current; // get this from function
-        if (!canvas) {
-            console.log("Error: Canvas Element not Found.");
-            return;
-        }
-        const context = canvas.getContext('2d');
-        if (!context) {
-            console.log("Error: Not Able to get Canvas Context.");
-            return;
-        }
-    }
+    /* ------------------------------ Main canvas inputs ------------------------------ */
 
-    function handleMouseMove(info: MouseEvent) {
-        const canvas = canvasRef.current; // get this from function
-        if (!canvas) {
-            console.log("Error: Canvas Element not Found.");
-            return;
-        }
-        const context = canvas.getContext('2d');
-        if (!context) {
-            console.log("Error: Not Able to get Canvas Context.");
-            return;
-        }
-        const xPos = info.offsetX;
-        const yPos = info.offsetY;
-        context.beginPath();
-        context.moveTo(drawFromPos.x, drawFromPos.y);
-        context.lineTo(xPos, yPos);
-        context.stroke();
-    }
-
-    const addItem = (e: React.MouseEvent, editing: boolean) => {
-        if (!editing) {
-            return;
-        }
-
-        const x = getCanvasPos(e).xPos
-        const y = getCanvasPos(e).yPos
-
-        for (let i = 0; i < vertices.length; i++) { // clicked on existing vertex
-            if ((vertices[i].x - 20 <= x) && 
-                (x <= vertices[i].x + 20) && 
-                (vertices[i].y - 20 <= y) && 
-                (y <= vertices[i].y + 20)) {
-                setDrawingEdge(!drawingEdge);
-                setDrawFromPos({x: vertices[i].x, y: vertices[i].y})
-                // drawEdgeFollowMouse(vertices[i].x, vertices[i].y)
-                // add edge to ds
-                return;
-            };
-        }
-
-        if (drawingEdge) {
-            setDrawingEdge(false);
-            return;
-        }
-
-        addVertex(x, y);
-    }
-
-    const addVertex = (x: number, y: number) => {
-        setVertices(prev => [...prev, { id: `${prev.length + 1}`, x, y, neighbours: [] }]);
-    }
-
-    const addEdge = (x: number, y: number) => {
-        // add to edge array and matrix
-    }
-
-    /* ------------------------------ Not in Use ------------------------------ */
-
-    // const addVertex = (e: React.MouseEvent, editing: boolean) => { // deprecated
-    //     if (!editing) {
-    //         return;
-    //     }
-    //     const canvas = canvasRef.current!.getBoundingClientRect();
-    //     const x = e.clientX - canvas.left;
-    //     const y = e.clientY - canvas.top;
-    //     for (let i = 0; i < vertices.length; i++) { // stop being able to place nodes above eachother
-    //         if ((vertices[i].x - 20 <= x) && 
-    //             (x <= vertices[i].x + 20) && 
-    //             (vertices[i].y - 20 <= y) && 
-    //             (y <= vertices[i].y + 20)) {
-    //             return;
-    //         };
-    //     }
-    //     setVertices(prev => [...prev, { id: `${prev.length + 1}`, x, y, neighbours: [] }]);
-    // }
-
-    // const addEdge = (e: React.MouseEvent, editing: boolean) => { // deprecated
-    //     if (!editing) {
-    //         return;
-    //     }
-    //     const canvas = canvasRef.current!.getBoundingClientRect();
-    //     const x = e.clientX - canvas.left;
-    //     const y = e.clientY - canvas.right;
-
-    //     for (let i = 0; i < vertices.length; i++) {
-    //         if ((vertices[i].x - 20 <= x) && 
-    //             (x <= vertices[i].x + 20) && 
-    //             (vertices[i].y - 20 <= y) && 
-    //             (y <= vertices[i].y + 20)) {
-    //             // change adjacency matrix or array
-    //             break
-    //         };
-    //     }
-    // }
-
-    /* ------------------------------ Not in Use ------------------------------ */
+    const canvas = canvasRef.current;
+    if (!canvas) {
+        console.log("Error: Canvas Element not Found.");
+        return;
+    };
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.log("Error: Not Able to get Canvas Context.");
+        return;
+    };
 
     useEffect(() => {
+        drawCanvas();
+    }, [vertices, edges, tempEdge]);
+
+    const drawCanvas = () => {
         const canvas = canvasRef.current;
         if (!canvas) {
             console.log("Error: Canvas Element not Found.");
             return;
-        }
+        };
         const context = canvas.getContext('2d');
         if (!context) {
             console.log("Error: Not Able to get Canvas Context.");
             return;
-        }
-
-        // draw vertices
-        vertices.forEach(v => {
-            drawVertex(context, v);
-        });
+        };
+        clearCanvas();
 
         // draw edges
+        edges.forEach(edge => {
+            const fromVertex = vertices.find(v => v.id === edge.from);
+            const toVertex = vertices.find(v => v.id === edge.to);
+            if (fromVertex && toVertex) {
+                drawEdge(
+                    context,
+                    fromVertex.x,
+                    fromVertex.y,
+                    toVertex.x,
+                    toVertex.y
+                );
+            };
+        });
 
-    }, [vertices]);
+        // draw dragging connection
+        if (tempEdge) {
+            drawEdge(
+                context,
+                tempEdge.startX,
+                tempEdge.startY,
+                tempEdge.endX,
+                tempEdge.endY
+            );
+        };
 
-    useEffect(() => { // moved all draw edge to this useEffect
-        // add / remove event listener.
-        const canvas = canvasRef.current; // get this from function
-        if (!canvas) {
-            console.log("Error: Canvas Element not Found.");
-            return;
-        }
-        const context = canvas.getContext('2d');
-        if (!context) {
-            console.log("Error: Not Able to get Canvas Context.");
-            return;
-        }
+        // draw vertices
+        vertices.forEach(vertex => {
+            drawVertex(context, vertex);
+        });
+    };
+
+    /* ------------------------------ Mouse handle inputs ------------------------------ */
+
+    const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>): MousePosition => {
+        const rec = canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rec.left,
+            y: e.clientY - rec.top
+        };
+    };
+
+    // make checks for if mouse in node location
+    const checkInVertex = (v: Vertex, x: number, y: number): boolean => {
+        if (v.x - v.width <= x && 
+            x <= v.x + v.width && 
+            v.y - v.width <= y && 
+            y <= v.y + v.width) {
+                return true;
+            };
+            return false;
+    };
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!editing) {
-            canvas.removeEventListener("mousemove", handleMouseMove);
             return;
         }
-        if (!drawingEdge) {
-            canvas.removeEventListener("mousemove", handleMouseMove);
-            return;
-        }
-        else {
-            canvas.addEventListener("mousemove", handleMouseMove)
-        }
-    }, [drawingEdge, editing]);
+        const pos = getMousePos(e);
+        // check if click location is in vertex to start connection
+        for (let i = 0; i < vertices.length; i++) {
+            if (checkInVertex(vertices[i], pos.x, pos.y)) {
+                setConnectingStart({
+                    edgeId: vertices[i].id,
+                    startX: vertices[i].x,
+                    startY: vertices[i].y
+                });
+                return;
+            } 
+            else {
+                addVertex(pos.x, pos.y);
+            }
+
+            // check for if move mode is toggled and set dragged node (TOADD)
+        };
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        const pos = getMousePos(e);
+
+        if (connectingStart) { // see if it is in a connecting state
+            setTempEdge({
+                startX: connectingStart.startX,
+                startY: connectingStart.startY,
+                endX: pos.x,
+                endY: pos.y
+            });
+        };
+
+        return;
+    };
+
+    // check for mouse lifted up
+    const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        if (connectingStart) {   
+        // const pos = getMousePos(e);
+            for (let i = 0; i < vertices.length; i++) {
+                if (vertices[i].id != connectingStart.edgeId) {
+                    addEdge(connectingStart.edgeId, vertices[i].id);
+                    break;
+                    };
+                };
+        };
+
+        setConnectingStart(null)
+        setTempEdge(null);
+    }
+
+    // function to move node (TOADD)
+    // if (isDragging) {
+    //     drawEdge(
+    //         ctx,
+    //         isDragging.startX,
+    //         isDragging.startY,
+    //         isDragging.endX,
+    //         isDragging.endY
+    //     );
+    // };
+
+    // const addItem = (e: React.MouseEvent, editing: boolean) => {
+    //     if (!editing) {
+    //         return;
+    //     };
+    //     const x = getCanvasPos(e).xPos
+    //     const y = getCanvasPos(e).yPos
+
+    //     for (let i = 0; i < vertices.length; i++) { // clicked on existing vertex
+    //         if ((vertices[i].x - 20 <= x) && 
+    //             (x <= vertices[i].x + 20) && 
+    //             (vertices[i].y - 20 <= y) && 
+    //             (y <= vertices[i].y + 20)) {
+
+    //             return;
+    //         };
+    //     };
+    //     addVertex(x, y);
+    // };
+
+    const addVertex = (x: number, y: number) => {
+        const newVertex: Vertex = {
+            id: (vertices.length + 1).toString(),
+            width: 20,
+            x: x,
+            y: y,
+            visited: false,
+            neighbours: []
+        };
+        setVertices([...vertices, newVertex]);
+    };
+
+    const addEdge = (fromId: string, toId: string) => {
+        setEdges(prev => [...prev, { from: fromId, to: toId }]);
+    };
 
     return (
         <>
@@ -278,6 +314,10 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             />
         )}
         <canvas 
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
             ref={canvasRef} 
             width={window.innerWidth} 
             height={window.innerHeight - 190}
@@ -288,8 +328,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                 width: "100%",
                 height: "calc(100% - 190px)",
                 zIndex: 0,
-            }}
-            onClick={(e) => addItem(e, editing)}>
+            }}>
             Use a browser that can use HTML Canvas.
         </canvas>
         </>
