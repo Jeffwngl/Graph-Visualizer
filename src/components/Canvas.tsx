@@ -34,6 +34,11 @@ interface tempEdge {
     endY: number;
 }
 
+interface Dimensions {
+    height: number;
+    width: number;
+}
+
 type canvasProps = {
     editing: boolean;
     setEdit: () => void;
@@ -44,8 +49,9 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [edges, setEdges] = useState<Edge[]>([]);
     const [connectingStart, setConnectingStart] = useState<connectionStart | null>(null);
     const [tempEdge, setTempEdge] = useState<tempEdge | null>(null);
-    // const [mouseLoc, setMouseLoc] = useState<MousePosition>({x: 0, y: 0})
+    // const [mouseLoc, setMouseLoc] = useState<MousePosition>({x: 0, y: 0});
     // const [draggedNode, setDraggedNode] = useState<string | null>(null);
+    const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -123,20 +129,21 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
 
     /* ------------------------------ Main canvas inputs ------------------------------ */
 
-    // const canvas = canvasRef.current;
-    // if (!canvas) {
-    //     console.log("Error: Canvas Element not Found.");
-    //     return;
-    // };
-    // const ctx = canvas.getContext('2d');
-    // if (!ctx) {
-    //     console.log("Error: Not Able to get Canvas Context.");
-    //     return;
-    // };
-
     useEffect(() => {
         drawCanvas();
     }, [vertices, edges, tempEdge]);
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+    });
+
+    const handleResize = () => {
+        setDimensions({
+            height: window.innerHeight,
+            width: window.innerWidth
+        })
+        drawCanvas();
+    }
 
     const eraseNodes = () => {
         setEdges([]);
