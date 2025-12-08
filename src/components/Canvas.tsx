@@ -39,6 +39,11 @@ interface Dimensions {
     width: number;
 }
 
+interface Offset {
+    x: number;
+    y: number;
+}
+
 type canvasProps = {
     editing: boolean;
     setEdit: () => void;
@@ -49,9 +54,10 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [edges, setEdges] = useState<Edge[]>([]);
     const [connectingStart, setConnectingStart] = useState<connectionStart | null>(null);
     const [tempEdge, setTempEdge] = useState<tempEdge | null>(null);
-    // const [mouseLoc, setMouseLoc] = useState<MousePosition>({x: 0, y: 0});
-    // const [draggedNode, setDraggedNode] = useState<string | null>(null);
+    const [mouseLoc, setMouseLoc] = useState<MousePosition>({x: 0, y: 0});
+    const [draggedNode, setDraggedNode] = useState<string | null>(null);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
+    const [offset, setOffset] = useState<Offset>({ x: 0, y: 0 });
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -131,7 +137,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
 
     useEffect(() => {
         drawCanvas();
-    }, [vertices, edges, tempEdge]);
+    }, [vertices, edges, tempEdge, mouseLoc]);
 
     useEffect(() => {
         window.addEventListener('resize', handleResize);
@@ -221,44 +227,55 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             v.y - v.width <= y && 
             y <= v.y + v.width) {
                 return true;
-            };
-            return false;
+        };
+        return false;
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (!editing) {
-            return;
-        }
         const pos = getMousePos(e);
-        // check if click location is in vertex to start connection
-        for (let i = 0; i < vertices.length; i++) {
+        if (editing) { // add new vertex
+            for (let i = 0; i < vertices.length; i++) {
+                if (checkInVertex(vertices[i], pos.x, pos.y)) {
+                    console.log("first")
+                    setConnectingStart({
+                        edgeId: vertices[i].id,
+                        startX: vertices[i].x,
+                        startY: vertices[i].y
+                    });
+                    return;
+                };
+            };
+            addVertex(pos.x, pos.y);
+        }
+        for (let i = 0; i < vertices.length; i++) { // move vertex
             if (checkInVertex(vertices[i], pos.x, pos.y)) {
-                setConnectingStart({
-                    edgeId: vertices[i].id,
-                    startX: vertices[i].x,
-                    startY: vertices[i].y
-
-                });
+                setDraggedNode(vertices[i].id);
+                setOffset({ x: vertices[i].x - pos.x, y: vertices[i].y - pos.y });
                 return;
-            } 
-            // check for if move mode is toggled and set dragged node (TOADD)
+            };
         };
-        addVertex(pos.x, pos.y);
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        const pos = getMousePos(e);
-
         if (connectingStart) { // see if it is in a connecting state
+            const pos = getMousePos(e);
             setTempEdge({
                 startX: connectingStart.startX,
                 startY: connectingStart.startY,
                 endX: pos.x,
                 endY: pos.y
             });
+        }
+        else if (draggedNode) {
+            const pos = getMousePos(e);
+            setMouseLoc({ x: pos.x, y: pos.y });
+            vertices.forEach((v) => {
+                if (v.id === draggedNode) {
+                    v.x = pos.x - offset.x;
+                    v.y = pos.y - offset.y;
+                };
+            });
         };
-
-        return;
     };
 
     // check for mouse lifted up
@@ -270,12 +287,15 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                     addEdge(connectingStart.edgeId, vertices[i].id);
                     break;
                     };
-                };
+            };
+            setConnectingStart(null);
+            setTempEdge(null);
+            return;
         };
-
-        setConnectingStart(null)
-        setTempEdge(null);
-    }
+        setDraggedNode(null);
+        setOffset({ x: 0, y: 0 });
+        setMouseLoc({ x: 0, y: 0});
+    };
 
     // function to move node (TOADD)
     // if (isDragging) {
