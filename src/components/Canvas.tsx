@@ -16,6 +16,11 @@ type Edge = {
     to: string;
 }
 
+type Coordinate = {
+    x: number;
+    y: number;
+}
+
 interface connectionStart {
     edgeId: string;
     startX: number;
@@ -44,6 +49,12 @@ interface Offset {
     y: number;
 }
 
+interface Arrow {
+    v1: Coordinate;
+    v2: Coordinate;
+    v3: Coordinate;
+}
+
 type canvasProps = {
     editing: boolean;
     setEdit: () => void;
@@ -58,6 +69,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [draggedNode, setDraggedNode] = useState<string | null>(null);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
     const [offset, setOffset] = useState<Offset>({ x: 0, y: 0 });
+    const [arrow, setArrow] = useState<Arrow | null>({ v1: {x: 0, y: 0}, v2: {x: 0,y: 0}, v3: {x: 0, y: 0} });
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -89,6 +101,21 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             ctx.lineWidth = 2;
             ctx.stroke();
     };
+
+    const drawArrow = (
+        ctx: CanvasRenderingContext2D,
+        v1: Coordinate,
+        v2: Coordinate,
+        v3: Coordinate
+    ) => {
+        ctx.beginPath();
+        ctx.moveTo(v1.x, v1.y);
+        ctx.lineTo(v2.x, v2.y);
+        ctx.lineTo(v3.x, v3.y);
+        ctx.closePath();
+        ctx.fillStyle = "black";
+        ctx.fill();
+    }
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
@@ -195,10 +222,161 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             );
         };
 
+        if (arrow) {
+            drawArrow(
+                context,
+                arrow.v1,
+                arrow.v2,
+                arrow.v3
+            );
+        };
+
         // draw vertices
         vertices.forEach(vertex => {
             drawVertex(context, vertex);
         });
+    };
+
+    /* ------------------------------ Get arrow coordinates ------------------------------ */
+
+    const calculateArrow = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        const pos = getMousePos(e);
+        const c1 = 10;
+        const c2 = 5;
+        let v1: Coordinate = {x: pos.x, y: pos.y};
+        let v2: Coordinate = {x: pos.x, y: pos.y};
+        let v3: Coordinate = {x: pos.x, y: pos.y};
+
+        if (connectingStart) {
+            const a = Math.abs(connectingStart.startX - pos.x);
+            const b = Math.abs(pos.y - connectingStart.startY);
+            const alpha = Math.atan(b / a);
+            // quadrant 1
+            if (pos.x < connectingStart.startX && pos.y > connectingStart.startY) {
+                v2 = {
+                    x: pos.x - Math.cos(alpha) * c1,
+                    y: pos.y + Math.sin(alpha) * c1
+                };
+                v1 = {
+                    x: pos.x - Math.sin(alpha) * c2,
+                    y: pos.y - Math.cos(alpha) * c2
+                };
+                v3 = {
+                    x: pos.x + Math.sin(alpha) * c2,
+                    y: pos.y + Math.cos(alpha) * c2
+                };
+            }
+            // quadrant 2
+            else if (pos.x > connectingStart.startX && pos.y > connectingStart.startY) {
+                v2 = {
+                    x: pos.x + Math.cos(alpha) * c1,
+                    y: pos.y + Math.sin(alpha) * c1
+                };
+                v1 = {
+                    x: pos.x - Math.sin(alpha) * c2,
+                    y: pos.y + Math.cos(alpha) * c2
+                };
+                v3 = {
+                    x: pos.x + Math.sin(alpha) * c2,
+                    y: pos.y - Math.cos(alpha) * c2
+                };
+            }
+            // quadrant 3
+            else if (pos.x < connectingStart.startX && pos.y < connectingStart.startY) {
+                v2 = {
+                    x: pos.x - Math.cos(alpha) * c1,
+                    y: pos.y - Math.sin(alpha) * c1
+                };
+                v1 = {
+                    x: pos.x + Math.sin(alpha) * c2,
+                    y: pos.y - Math.cos(alpha) * c2
+                };
+                v3 = {
+                    x: pos.x - Math.sin(alpha) * c2,
+                    y: pos.y + Math.cos(alpha) * c2
+                };
+            }
+            // quadrant 4
+            else if (pos.x > connectingStart.startX && pos.y < connectingStart.startY) {
+                v2 = {
+                    x: pos.x + Math.cos(alpha) * c1,
+                    y: pos.y - Math.sin(alpha) * c1
+                };
+                v1 = {
+                    x: pos.x + Math.sin(alpha) * c2,
+                    y: pos.y + Math.cos(alpha) * c2
+                };
+                v3 = {
+                    x: pos.x - Math.sin(alpha) * c2,
+                    y: pos.y - Math.cos(alpha) * c2
+                };
+            }
+            // parallel cases
+            else if (pos.x == connectingStart.startX && pos.y == connectingStart.startY) {
+
+            }
+            else if (pos.x == connectingStart.startX && pos.y > connectingStart.startY) {
+                v2 = {
+                    x: pos.x,
+                    y: pos.y + c1
+                };
+                v1 = {
+                    x: pos.x - c2,
+                    y: pos.y
+                };
+                v3 = {
+                    x: pos.x + c2,
+                    y: pos.y
+                }; 
+            }
+            else if (pos.x == connectingStart.startX && pos.y < connectingStart.startY) {
+                v2 = {
+                    x: pos.x,
+                    y: pos.y - c1
+                };
+                v1 = {
+                    x: pos.x - c2,
+                    y: pos.y
+                };
+                v3 = {
+                    x: pos.x + c2,
+                    y: pos.y
+                }; 
+            }
+            else if (pos.y == connectingStart.startY && pos.x > connectingStart.startX) {
+                v2 = {
+                    x: pos.x + c1,
+                    y: pos.y
+                };
+                v1 = {
+                    x: pos.x,
+                    y: pos.y + c2
+                };
+                v3 = {
+                    x: pos.x,
+                    y: pos.y - c2
+                }; 
+            }
+            else if (pos.y == connectingStart.startY && pos.x < connectingStart.startX) {
+                v2 = {
+                    x: pos.x - c1,
+                    y: pos.y
+                };
+                v1 = {
+                    x: pos.x,
+                    y: pos.y + c2
+                };
+                v3 = {
+                    x: pos.x,
+                    y: pos.y - c2
+                }; 
+            }
+            setArrow({
+                v1: v1,
+                v2: v2,
+                v3: v3
+            });
+        };
     };
 
     /* ------------------------------ Mouse handle inputs ------------------------------ */
@@ -265,8 +443,9 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                 endX: pos.x,
                 endY: pos.y
             });
+            calculateArrow(e);
         }
-        else if (draggedNode) {
+        else if (draggedNode) { // see if it is in a moving state
             const pos = getMousePos(e);
             setMouseLoc({ x: pos.x, y: pos.y });
             vertices.forEach((v) => {
@@ -278,7 +457,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         };
     };
 
-    // check for mouse lifted up
     const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (connectingStart) {   
             const pos = getMousePos(e);
@@ -288,6 +466,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                     break;
                     };
             };
+            setArrow(null);
             setConnectingStart(null);
             setTempEdge(null);
             return;
@@ -296,36 +475,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         setOffset({ x: 0, y: 0 });
         setMouseLoc({ x: 0, y: 0});
     };
-
-    // function to move node (TOADD)
-    // if (isDragging) {
-    //     drawEdge(
-    //         ctx,
-    //         isDragging.startX,
-    //         isDragging.startY,
-    //         isDragging.endX,
-    //         isDragging.endY
-    //     );
-    // };
-
-    // const addItem = (e: React.MouseEvent, editing: boolean) => {
-    //     if (!editing) {
-    //         return;
-    //     };
-    //     const x = getCanvasPos(e).xPos
-    //     const y = getCanvasPos(e).yPos
-
-    //     for (let i = 0; i < vertices.length; i++) { // clicked on existing vertex
-    //         if ((vertices[i].x - 20 <= x) && 
-    //             (x <= vertices[i].x + 20) && 
-    //             (vertices[i].y - 20 <= y) && 
-    //             (y <= vertices[i].y + 20)) {
-
-    //             return;
-    //         };
-    //     };
-    //     addVertex(x, y);
-    // };
 
     const addVertex = (x: number, y: number) => {
         const newVertex: Vertex = {
@@ -337,7 +486,7 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             neighbours: []
         };
         setVertices([...vertices, newVertex]);
-        console.log("vertex added: " + vertices[vertices.length - 1].id);
+        // console.log("vertex added: " + vertices[vertices.length - 1].id);
     };
 
     const addEdge = (fromId: string, toId: string) => {
