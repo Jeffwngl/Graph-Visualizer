@@ -74,7 +74,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
     const [offset, setOffset] = useState<Offset>({ x: 0, y: 0 });
     const [tempArrow, setTempArrow] = useState<Arrow | null>({ v1: {x: 0, y: 0}, v2: {x: 0,y: 0}, v3: {x: 0, y: 0} });
-    const [arrows, setArrows] = useState<Arrow[]>([]);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -186,7 +185,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const eraseNodes = () => {
         setEdges([]);
         setVertices([]);
-        setArrows([]);
     }
 
     const drawCanvas = () => {
@@ -214,6 +212,18 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                     toVertex.x,
                     toVertex.y
                 );
+                const edgePos = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y)
+                // calculate arrow vertices
+                if (edgePos) {
+                    const arrow = calculateArrow(fromVertex.x, fromVertex.y, edgePos.x, edgePos.y);
+                    console.log("vx: " + toVertex.x)
+                    console.log("vy: " + toVertex.y)
+                    console.log("edgex: " + edgePos.x)
+                    console.log("edgey: " + edgePos.y)
+                    if (arrow) {
+                        drawArrow(context, arrow.v1, arrow.v2, arrow.v3);
+                    }
+                }
             };
         });
 
@@ -241,167 +251,159 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         vertices.forEach(vertex => {
             drawVertex(context, vertex);
         });
-
-        // draw arrows
-        arrows.forEach(arrow => {
-            drawArrow(context, arrow.v1, arrow.v2, arrow.v3)
-        })
     };
 
     /* ------------------------------ Get arrow coordinates ------------------------------ */
 
-    const calculateArrow = (x: number, y: number) => { // change input argument to a location instead of a mouse event
+    const calculateArrow = (x1: number, y1: number, x2: number, y2: number) => { // change input argument to a location instead of a mouse event
         const c1 = ARROWHEIGHT;
         const c2 = ARROWWIDTH;
-        let v1: Coordinate = {x: x, y: y};
-        let v2: Coordinate = {x: x, y: y};
-        let v3: Coordinate = {x: x, y: y};
+        let v1: Coordinate = {x: x2, y: y2};
+        let v2: Coordinate = {x: x2, y: y2};
+        let v3: Coordinate = {x: x2, y: y2};
 
-        if (connectingStart) {
-            const a = Math.abs(connectingStart.startX - x);
-            const b = Math.abs(y - connectingStart.startY);
-            const alpha = Math.atan(b / a);
-            // quadrant 1
-            if (x < connectingStart.startX && y > connectingStart.startY) {
-                v2 = {
-                    x: x - Math.cos(alpha) * c1,
-                    y: y + Math.sin(alpha) * c1
-                };
-                v1 = {
-                    x: x - Math.sin(alpha) * c2,
-                    y: y - Math.cos(alpha) * c2
-                };
-                v3 = {
-                    x: x + Math.sin(alpha) * c2,
-                    y: y + Math.cos(alpha) * c2
-                };
-            }
-            // quadrant 2
-            else if (x > connectingStart.startX && y > connectingStart.startY) {
-                v2 = {
-                    x: x + Math.cos(alpha) * c1,
-                    y: y + Math.sin(alpha) * c1
-                };
-                v1 = {
-                    x: x - Math.sin(alpha) * c2,
-                    y: y + Math.cos(alpha) * c2
-                };
-                v3 = {
-                    x: x + Math.sin(alpha) * c2,
-                    y: y - Math.cos(alpha) * c2
-                };
-            }
-            // quadrant 3
-            else if (x < connectingStart.startX && y < connectingStart.startY) {
-                v2 = {
-                    x: x - Math.cos(alpha) * c1,
-                    y: y - Math.sin(alpha) * c1
-                };
-                v1 = {
-                    x: x + Math.sin(alpha) * c2,
-                    y: y - Math.cos(alpha) * c2
-                };
-                v3 = {
-                    x: x - Math.sin(alpha) * c2,
-                    y: y + Math.cos(alpha) * c2
-                };
-            }
-            // quadrant 4
-            else if (x > connectingStart.startX && y < connectingStart.startY) {
-                v2 = {
-                    x: x + Math.cos(alpha) * c1,
-                    y: y - Math.sin(alpha) * c1
-                };
-                v1 = {
-                    x: x + Math.sin(alpha) * c2,
-                    y: y + Math.cos(alpha) * c2
-                };
-                v3 = {
-                    x: x - Math.sin(alpha) * c2,
-                    y: y - Math.cos(alpha) * c2
-                };
-            }
-            // parallel cases
-            else if (x == connectingStart.startX && y == connectingStart.startY) {
+        const a = Math.abs(x1 - x2);
+        const b = Math.abs(y2 - y1);
+        const alpha = Math.atan(b / a);
+        // quadrant 1
+        if (x2 < x1 && y2 > y1) {
+            v2 = {
+                x: x2 - Math.cos(alpha) * c1,
+                y: y2 + Math.sin(alpha) * c1
+            };
+            v1 = {
+                x: x2 - Math.sin(alpha) * c2,
+                y: y2 - Math.cos(alpha) * c2
+            };
+            v3 = {
+                x: x2 + Math.sin(alpha) * c2,
+                y: y2 + Math.cos(alpha) * c2
+            };
+        }
+        // quadrant 2
+        else if (x2 > x1 && y2 > y1) {
+            v2 = {
+                x: x2 + Math.cos(alpha) * c1,
+                y: y2 + Math.sin(alpha) * c1
+            };
+            v1 = {
+                x: x2 - Math.sin(alpha) * c2,
+                y: y2 + Math.cos(alpha) * c2
+            };
+            v3 = {
+                x: x2 + Math.sin(alpha) * c2,
+                y: y2 - Math.cos(alpha) * c2
+            };
+        }
+        // quadrant 3
+        else if (x2 < x1 && y2 < y1) {
+            v2 = {
+                x: x2 - Math.cos(alpha) * c1,
+                y: y2 - Math.sin(alpha) * c1
+            };
+            v1 = {
+                x: x2 + Math.sin(alpha) * c2,
+                y: y2 - Math.cos(alpha) * c2
+            };
+            v3 = {
+                x: x2 - Math.sin(alpha) * c2,
+                y: y2 + Math.cos(alpha) * c2
+            };
+        }
+        // quadrant 4
+        else if (x2 > x1 && y2 < y1) {
+            v2 = {
+                x: x2 + Math.cos(alpha) * c1,
+                y: y2 - Math.sin(alpha) * c1
+            };
+            v1 = {
+                x: x2 + Math.sin(alpha) * c2,
+                y: y2 + Math.cos(alpha) * c2
+            };
+            v3 = {
+                x: x2 - Math.sin(alpha) * c2,
+                y: y2 - Math.cos(alpha) * c2
+            };
+        }
+        // parallel cases
+        else if (x2 == x1 && y2 == y1) {
 
-            }
-            else if (x == connectingStart.startX && y > connectingStart.startY) {
-                v2 = {
-                    x: x,
-                    y: y + c1
-                };
-                v1 = {
-                    x: x - c2,
-                    y: y
-                };
-                v3 = {
-                    x: x + c2,
-                    y: y
-                }; 
-            }
-            else if (x == connectingStart.startX && y < connectingStart.startY) {
-                v2 = {
-                    x: x,
-                    y: y - c1
-                };
-                v1 = {
-                    x: x - c2,
-                    y: y
-                };
-                v3 = {
-                    x: x + c2,
-                    y: y
-                }; 
-            }
-            else if (y == connectingStart.startY && x > connectingStart.startX) {
-                v2 = {
-                    x: x + c1,
-                    y: y
-                };
-                v1 = {
-                    x: x,
-                    y: y + c2
-                };
-                v3 = {
-                    x: x,
-                    y: y - c2
-                }; 
-            }
-            else if (y == connectingStart.startY && x < connectingStart.startX) {
-                v2 = {
-                    x: x - c1,
-                    y: y
-                };
-                v1 = {
-                    x: x,
-                    y: y + c2
-                };
-                v3 = {
-                    x: x,
-                    y: y - c2
-                }; 
-            }
-            setTempArrow({
-                v1: v1,
-                v2: v2,
-                v3: v3
-            });
+        }
+        else if (x2 == x1 && y2 > y1) {
+            v2 = {
+                x: x2,
+                y: y2 + c1
+            };
+            v1 = {
+                x: x2 - c2,
+                y: y2
+            };
+            v3 = {
+                x: x2 + c2,
+                y: y2
+            }; 
+        }
+        else if (x2 == x1 && y2 < y1) {
+            v2 = {
+                x: x2,
+                y: y2 - c1
+            };
+            v1 = {
+                x: x2 - c2,
+                y: y2
+            };
+            v3 = {
+                x: x2 + c2,
+                y: y2
+            }; 
+        }
+        else if (y2 == y1 && x2 > x1) {
+            v2 = {
+                x: x2 + c1,
+                y: y2
+            };
+            v1 = {
+                x: x2,
+                y: y2 + c2
+            };
+            v3 = {
+                x: x2,
+                y: y2 - c2
+            }; 
+        }
+        else if (y2 == y1 && x2 < x1) {
+            v2 = {
+                x: x2 - c1,
+                y: y2
+            };
+            v1 = {
+                x: x2,
+                y: y2 + c2
+            };
+            v3 = {
+                x: x2,
+                y: y2 - c2
+            }; 
+        }
+        return {
+            v1: v1,
+            v2: v2,
+            v3: v3
+
         };
     };
 
-    const calculateOffset = ( x: number, y: number ) => {
-        if (connectingStart) {
-            const dx = x - connectingStart.startX;
-            const dy = y - connectingStart.startY;
-            const d = Math.sqrt(dx * dx + dy *dy);
-            const unitX = dx / d; // unit vectors in x and y direction
-            const unitY = dy / d;
-            const edgeX = x - (NODESIZE + ARROWHEIGHT) * unitX;
-            const edgeY = y - (NODESIZE + ARROWHEIGHT) * unitY;
-            return {
-                x: edgeX,
-                y: edgeY
-            }
+    const calculateOffset = ( x1: number, y1: number, x2: number, y2: number ) => {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const d = Math.sqrt(dx * dx + dy *dy);
+        const unitX = dx / d; // unit vectors in x and y direction
+        const unitY = dy / d;
+        const edgeX = x2 - (NODESIZE + ARROWHEIGHT) * unitX;
+        const edgeY = y2 - (NODESIZE + ARROWHEIGHT) * unitY;
+        return {
+            x: edgeX,
+            y: edgeY
         }
     }
 
@@ -472,22 +474,28 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
                         endY: v.y
                     });
                     // add calculate arrow at edge of node
-                    const vertexEdge = calculateOffset(v.x, v.y);
+                    const vertexEdge = calculateOffset(connectingStart.startX, connectingStart.startY, v.x, v.y);
                     if (vertexEdge) {
-                        calculateArrow(vertexEdge.x, vertexEdge.y);
-                    }
+                        const arrow = calculateArrow(connectingStart.startX, connectingStart.startY, vertexEdge.x, vertexEdge.y);
+                        if (arrow) {
+                            setTempArrow(arrow);
+                        };
+                    };
                     return;
-                }
-            }
-        
+                };
+            };
+            
+            // dragging state
             setTempEdge({
                 startX: connectingStart.startX,
                 startY: connectingStart.startY,
                 endX: pos.x,
                 endY: pos.y
             });
-
-            calculateArrow(pos.x, pos.y);
+            const arrow = calculateArrow(connectingStart.startX, connectingStart.startY, pos.x, pos.y);
+            if (arrow) {
+                setTempArrow(arrow);
+            }
         }
         else if (draggedNode) { // see if it is in a moving state
             const pos = getMousePos(e);
@@ -507,13 +515,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             for (let i = 0; i < vertices.length; i++) {
                 if (vertices[i].id != connectingStart.edgeId && checkInVertex(vertices[i], pos.x, pos.y)) {
                     addEdge(connectingStart.edgeId, vertices[i].id); // add edge
-                    const vertexEdge = calculateOffset(vertices[i].x, vertices[i].y); // add arrow
-                    if (vertexEdge) {
-                        calculateArrow(vertexEdge.x, vertexEdge.y);
-                    }
-                    if (tempArrow) {
-                        addArrow(tempArrow);
-                    }
                     break;
                 };
             };
@@ -551,10 +552,6 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
             }
         }
     };
-
-    const addArrow = (a: Arrow) => {
-        setArrows(prev => [...prev, a]);
-    }
 
     const dfs = (fromVertex: string) => {
         // for (let v of vertices) {
