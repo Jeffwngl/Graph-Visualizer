@@ -11,8 +11,8 @@ type Vertex = {
     width: number;
     x: number;
     y: number;
-    visited?: boolean;
-    neighbours: string[];
+    visited: boolean;
+    neighbours: Vertex[];
 }
 
 type Edge = {
@@ -256,139 +256,22 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     /* ------------------------------ Get arrow coordinates ------------------------------ */
 
     const calculateArrow = (x1: number, y1: number, x2: number, y2: number) => { // change input argument to a location instead of a mouse event
-        const c1 = ARROWHEIGHT;
-        const c2 = ARROWWIDTH;
-        let v1: Coordinate = {x: x2, y: y2};
-        let v2: Coordinate = {x: x2, y: y2};
-        let v3: Coordinate = {x: x2, y: y2};
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const angle = Math.atan2(dy, dx);
+        const tipX = x2 + Math.cos(angle) * ARROWHEIGHT;
+        const tipY = y2 + Math.sin(angle) * ARROWHEIGHT;
 
-        const a = Math.abs(x1 - x2);
-        const b = Math.abs(y2 - y1);
-        const alpha = Math.atan(b / a);
-        // quadrant 1
-        if (x2 < x1 && y2 > y1) {
-            v2 = {
-                x: x2 - Math.cos(alpha) * c1,
-                y: y2 + Math.sin(alpha) * c1
-            };
-            v1 = {
-                x: x2 - Math.sin(alpha) * c2,
-                y: y2 - Math.cos(alpha) * c2
-            };
-            v3 = {
-                x: x2 + Math.sin(alpha) * c2,
-                y: y2 + Math.cos(alpha) * c2
-            };
-        }
-        // quadrant 2
-        else if (x2 > x1 && y2 > y1) {
-            v2 = {
-                x: x2 + Math.cos(alpha) * c1,
-                y: y2 + Math.sin(alpha) * c1
-            };
-            v1 = {
-                x: x2 - Math.sin(alpha) * c2,
-                y: y2 + Math.cos(alpha) * c2
-            };
-            v3 = {
-                x: x2 + Math.sin(alpha) * c2,
-                y: y2 - Math.cos(alpha) * c2
-            };
-        }
-        // quadrant 3
-        else if (x2 < x1 && y2 < y1) {
-            v2 = {
-                x: x2 - Math.cos(alpha) * c1,
-                y: y2 - Math.sin(alpha) * c1
-            };
-            v1 = {
-                x: x2 + Math.sin(alpha) * c2,
-                y: y2 - Math.cos(alpha) * c2
-            };
-            v3 = {
-                x: x2 - Math.sin(alpha) * c2,
-                y: y2 + Math.cos(alpha) * c2
-            };
-        }
-        // quadrant 4
-        else if (x2 > x1 && y2 < y1) {
-            v2 = {
-                x: x2 + Math.cos(alpha) * c1,
-                y: y2 - Math.sin(alpha) * c1
-            };
-            v1 = {
-                x: x2 + Math.sin(alpha) * c2,
-                y: y2 + Math.cos(alpha) * c2
-            };
-            v3 = {
-                x: x2 - Math.sin(alpha) * c2,
-                y: y2 - Math.cos(alpha) * c2
-            };
-        }
-        // parallel cases
-        else if (x2 == x1 && y2 == y1) {
+        const perpAngle = angle + Math.PI / 2;
+        const edge1X = x2 + Math.cos(perpAngle) * ARROWWIDTH;
+        const edge1Y = x2 + Math.sin(perpAngle) * ARROWWIDTH;
+        const edge2X = x2 - Math.cos(perpAngle) * ARROWWIDTH;
+        const edge2Y = x2 - Math.sin(perpAngle) * ARROWWIDTH;
 
-        }
-        else if (x2 == x1 && y2 > y1) {
-            v2 = {
-                x: x2,
-                y: y2 + c1
-            };
-            v1 = {
-                x: x2 - c2,
-                y: y2
-            };
-            v3 = {
-                x: x2 + c2,
-                y: y2
-            }; 
-        }
-        else if (x2 == x1 && y2 < y1) {
-            v2 = {
-                x: x2,
-                y: y2 - c1
-            };
-            v1 = {
-                x: x2 - c2,
-                y: y2
-            };
-            v3 = {
-                x: x2 + c2,
-                y: y2
-            }; 
-        }
-        else if (y2 == y1 && x2 > x1) {
-            v2 = {
-                x: x2 + c1,
-                y: y2
-            };
-            v1 = {
-                x: x2,
-                y: y2 + c2
-            };
-            v3 = {
-                x: x2,
-                y: y2 - c2
-            }; 
-        }
-        else if (y2 == y1 && x2 < x1) {
-            v2 = {
-                x: x2 - c1,
-                y: y2
-            };
-            v1 = {
-                x: x2,
-                y: y2 + c2
-            };
-            v3 = {
-                x: x2,
-                y: y2 - c2
-            }; 
-        }
         return {
-            v1: v1,
-            v2: v2,
-            v3: v3
+            v1: { x: edge1X, y: edge1Y },
+            v2: { x: tipX, y: tipY },
+            v3: { x: edge2X, y: edge2Y }
 
         };
     };
@@ -440,23 +323,22 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const pos = getMousePos(e);
         if (editing) { // add new vertex
-            for (let i = 0; i < vertices.length; i++) {
-                if (checkInVertex(vertices[i], pos.x, pos.y)) {
-                    console.log("first")
+            for (let v of vertices) {
+                if (checkInVertex(v, pos.x, pos.y)) {
                     setConnectingStart({
-                        edgeId: vertices[i].id,
-                        startX: vertices[i].x,
-                        startY: vertices[i].y
+                        edgeId: v.id,
+                        startX: v.x,
+                        startY: v.y
                     });
                     return;
                 };
             };
             addVertex(pos.x, pos.y);
         }
-        for (let i = 0; i < vertices.length; i++) { // move vertex
-            if (checkInVertex(vertices[i], pos.x, pos.y)) {
-                setDraggedNode(vertices[i].id);
-                setOffset({ x: vertices[i].x - pos.x, y: vertices[i].y - pos.y });
+        for (let v of vertices) { // move vertex
+            if (checkInVertex(v, pos.x, pos.y)) {
+                setDraggedNode(v.id);
+                setOffset({ x: v.x - pos.x, y: v.y - pos.y });
                 return;
             };
         };
@@ -541,31 +423,53 @@ export default function Canvas( {editing, setEdit}: canvasProps ) {
         // console.log("vertex added: " + vertices[vertices.length - 1].id);
     };
 
-    const addEdge = (fromId: string, toId: string) => {
+    const addEdge = (fromId: string, toId: string) => { // maybe change this to take in a vertex object
         setEdges(prev => [...prev, { from: fromId, to: toId }]);
         console.log("edge from: " + fromId)
         console.log("edge to: " + toId)
+        // find to vertex
+        let toVertex;
+        for (let v of vertices) {
+            if (v.id == toId) {
+                toVertex = v;
+            }
+        }
+        // find from vertex and append to vertex to neighbours
         for (let v of vertices) {
             if (v.id == fromId) {
-                v.neighbours.push(toId);
+                if (toVertex) {
+                    v.neighbours.push(toVertex);
+                }
                 break;
             }
         }
     };
 
-    const dfs = (fromVertex: string) => {
-        // for (let v of vertices) {
-        //     if (v.id === fromVertex) {
-        //         fromNode = v;
-        //     }
-        // }
-        // if (fromNode == null) {
+    const dfs = async (fromVertex: string, delay: number = 1000) => {
 
-        // }
+        setVertices(prev => prev.map(v => ({ ...v, visited: false })));
+
+        let startingVertex = vertices.find(v => v.id === fromVertex);
+        if (!startingVertex) {
+            console.log("Node not found.");
+        };
+
+        const dfsRec = async (currentId: string) => {
+            setVertices(prev => prev.map(v => v.id === currentId ? {...v, visited: true} : v));
+            await new Promise(resolve => setTimeout(resolve, delay));
+            const currentVertex = vertices.find(v => v.id === currentId);
+            if (currentVertex) {
+                for (let v of currentVertex.neighbours) {
+                    await dfsRec(v.id);
+                };
+            };
+        };
+
+        await dfsRec(fromVertex);
     }
 
     const bfs = (fromVertex: string) => {
-
+        setVertices(prev => prev.map(v => ({ ...v, visited: false })));
     }
 
     return (
