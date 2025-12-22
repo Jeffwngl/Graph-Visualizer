@@ -6,15 +6,16 @@ import { drawEdge, drawVertex, drawArrow } from "../hooks/useCanvasDraw";
 import { calculateArrow, calculateOffset } from "../hooks/useGeometryCalc";
 import { useMouseHandler } from "../hooks/useMouse";
 import { useAlgos } from "../hooks/useGraphAlgos";
-import LeftMenu from "./LeftMenu";
+import InputSearch from "./pop-ups/input";
 
 type canvasProps = {
     editing: boolean;
+    inputing: boolean;
     setEditFalse: () => void;
-    setEditTrue: () => void;
+    setInputFalse: () => void;
 }
 
-export default function Canvas( {editing, setEditFalse, setEditTrue}: canvasProps ) {
+export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
@@ -69,7 +70,6 @@ export default function Canvas( {editing, setEditFalse, setEditTrue}: canvasProp
     //     isAnimating,
     //     stopAnimation
     // } = useAlgos(vertices, setVertices);
-    // // export dfs;
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -182,8 +182,14 @@ export default function Canvas( {editing, setEditFalse, setEditTrue}: canvasProp
             closePopUp={ setEditFalse }
             clearCanvas={ eraseNodes }
             />
-        )}
-        <LeftMenu editOnToggle={ setEditTrue }></LeftMenu>
+        )};
+
+        {inputing && (
+            <InputSearch
+            closePopUp={ setInputFalse }
+            />
+        )};
+
         <canvas 
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}

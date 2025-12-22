@@ -5,11 +5,10 @@ import BottomMenu from './components/BottomMenu'
 import LeftMenu from './components/LeftMenu'
 import RightMenu from './components/RightMenu'
 import Canvas from './components/Canvas'
-import EditGraph from './components/pop-ups/edit'
-
 
 function App() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isInputing, setIsInputing] = useState<boolean>(false);
 
   useEffect(() => {
     console.log("isEditing:", isEditing);
@@ -19,15 +18,21 @@ function App() {
     <>
       <HeroMenu />
       <div className='Main'>
-        {/* <LeftMenu 
-          editOnToggle={ () => setIsEditing(true) }
-        /> */}
+
+        <LeftMenu 
+            editOnToggle={ () => setIsEditing(true) }
+            inputOnToggle={ () => setIsInputing(true) }
+        />
+
         <Canvas 
           editing={ isEditing }
+          inputing={ isInputing }
           setEditFalse={ () => setIsEditing(false) }
-          setEditTrue={ () => setIsEditing(true) }
+          setInputFalse={ () => setIsInputing(false) }
         />
+
         <RightMenu />
+
       </div>
       <BottomMenu />
     </>
