@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 
 export default function RightMenu() {
-    const [isOpen, setIsOpen] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
 
     return (
         <div className={`RightMenu ${isOpen ? "open" : "closed"}`}>

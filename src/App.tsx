@@ -19,12 +19,13 @@ function App() {
     <>
       <HeroMenu />
       <div className='Main'>
-        <LeftMenu 
+        {/* <LeftMenu 
           editOnToggle={ () => setIsEditing(true) }
-        />
+        /> */}
         <Canvas 
           editing={ isEditing }
-          setEdit={ () => setIsEditing(false) }
+          setEditFalse={ () => setIsEditing(false) }
+          setEditTrue={ () => setIsEditing(true) }
         />
         <RightMenu />
       </div>
