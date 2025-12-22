@@ -1,0 +1,44 @@
+.InputSearch{
+  position: fixed;
+  left: 30%;
+  top: 10%;
+  width: 700px;
+  height: 30px;
+  border: 2px solid rgb(0, 0, 0);
+  border-radius: 1em;
+  box-shadow: -2px 5px 5px rgb(0, 0, 0);
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #011627;
+  transition: all 0.3s;
+  padding: 10px;
+  font-size: small;
+  z-index: 1;
+
+  opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 0.3s;
+
+}
+
+#inputCloseButton {
+  border: none;
+  background-color: rgb(0, 0, 0);
+  border-radius: 10px;
+  color: white;
+  padding: 7px;
+  cursor: pointer;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
