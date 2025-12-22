@@ -65,11 +65,11 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         mouseLoc
     } = useMouseHandler(vertices, canvasRef, editing, addVertex, addEdge);
     
-    // const {
-    //     dfs,
-    //     isAnimating,
-    //     stopAnimation
-    // } = useAlgos(vertices, setVertices);
+    const {
+        dfs,
+        isAnimating,
+        stopAnimation
+    } = useAlgos(vertices, setVertices);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -182,13 +182,15 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
             closePopUp={ setEditFalse }
             clearCanvas={ eraseNodes }
             />
-        )};
+        )}
 
         {inputing && (
             <InputSearch
             closePopUp={ setInputFalse }
+            dfs={ dfs }
+            reset={stopAnimation}
             />
-        )};
+        )}
 
         <canvas 
             onMouseDown={handleMouseDown}

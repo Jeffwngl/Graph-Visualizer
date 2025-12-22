@@ -24,13 +24,11 @@ export default function LeftMenu({ editOnToggle, inputOnToggle }: leftMenuProps)
                         setImportOpen(true)
                     }>Import Graph</button>
 
+                    <button className="MenuButton">Export Graph</button>
+
                     <button className="MenuButton" id="dfs" onClick={() => {
                         inputOnToggle();
                     }}>Traverse Graph</button>
-
-                    <button className="MenuButton" id="bfs">BFS</button>
-                    <button className="MenuButton" id="bfs">Djikstra's</button>
-                    <button className="MenuButton" id="stopAnimation">Stop Animation</button>
                 </div>
             )}
         </div>

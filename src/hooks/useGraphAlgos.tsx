@@ -11,14 +11,19 @@ export const useAlgos = (
     const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
     const dfs = async (startId: string) => {
+        console.log("dfs")
         setVertices(prev => prev.map(v => ({ ...v, visited: false})));
 
         const visited = new Set<string>();
 
         const dfsRec = async (currentId: string) => {
+            console.log("rec")
             if (visited.has(currentId)) {
                 return;
             };
+
+            visited.add(currentId);
+            
             setVertices(prev => prev.map(v => v.id === currentId ? {...v, visited: true} : v));
             await new Promise(resolve => setTimeout(resolve, DELAY));
             const currentVertex = vertices.find(v => v.id === currentId);

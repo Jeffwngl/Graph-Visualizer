@@ -11,7 +11,7 @@ export default function RightMenu() {
             <button className='ToggleRight' id='toggleRight' onClick={() => setIsOpen(!isOpen)}>{isOpen ? <RightArrowIcon /> : <LeftArrowIcon /> }</button>
             {isOpen && (
                 <div className="StepsMenu">
-                    <p>Step 1</p>
+                    <p>Steps:</p>
                 </div>
             )}
         </div>
