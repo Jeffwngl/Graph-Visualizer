@@ -63,7 +63,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         tempArrow,
         tempEdge,
         mouseLoc
-    } = useMouseHandler(vertices, canvasRef, editing, addVertex, addEdge);
+    } = useMouseHandler(vertices, canvasRef, editing, inputing, addVertex, addEdge);
     
     const {
         dfs,
@@ -121,7 +121,6 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         };
         clearCanvas();
 
-        // draw edges
         edges.forEach(edge => {
             const fromVertex = vertices.find(v => v.id === edge.from);
             const toVertex = vertices.find(v => v.id === edge.to);
@@ -149,7 +148,6 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
             };
         });
 
-        // draw dragging connection
         if (tempEdge) {
             drawEdge(
                 context,

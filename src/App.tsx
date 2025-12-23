@@ -8,7 +8,7 @@ import Canvas from './components/Canvas'
 
 function App() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isInputing, setIsInputing] = useState<boolean>(false);
+  const [isInputing, setIsInputing] = useState<boolean>(true);
 
   useEffect(() => {
     console.log("isEditing:", isEditing);
@@ -20,8 +20,16 @@ function App() {
       <div className='Main'>
 
         <LeftMenu 
-            editOnToggle={ () => setIsEditing(true) }
-            inputOnToggle={ () => setIsInputing(true) }
+            editOnToggle={ () => {
+              if (!isInputing) {
+                setIsEditing(true);
+              }
+            }}
+            inputOnToggle={ () => {
+              if (!isEditing) {
+                setIsInputing(true);
+              }
+            }}
         />
 
         <Canvas 

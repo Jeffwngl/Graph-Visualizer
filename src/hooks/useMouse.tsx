@@ -7,6 +7,7 @@ export const useMouseHandler = (
     vertices: Vertex[],
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     editing: boolean,
+    inputing: boolean,
     addVertex: (x: number, y: number) => void,
     addEdge: (from: string, to: string) => void
     ) => {
@@ -46,11 +47,13 @@ export const useMouseHandler = (
             };
             addVertex(pos.x, pos.y);
         }
-        for (let v of vertices) { // move vertex
-            if (checkInVertex(v, pos.x, pos.y)) {
-                setDraggedNode(v.id);
-                setOffset({ x: v.x - pos.x, y: v.y - pos.y });
-                return;
+        if (!inputing) {
+            for (let v of vertices) { // move vertex
+                if (checkInVertex(v, pos.x, pos.y)) {
+                    setDraggedNode(v.id);
+                    setOffset({ x: v.x - pos.x, y: v.y - pos.y });
+                    return;
+                };
             };
         };
     };
