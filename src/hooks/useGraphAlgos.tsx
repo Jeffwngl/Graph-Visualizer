@@ -1,6 +1,6 @@
 import type { Vertex, Edge } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const DELAY = 1000;
 
@@ -9,21 +9,22 @@ export const useAlgos = (
     setVertices: Dispatch<SetStateAction<Vertex[]>>,
 ) => {
     const [isAnimating, setIsAnimating] = useState<boolean>(false);
+    const stopRequest = useRef(false);
 
     const dfs = async (startId: string) => {
         console.log("dfs")
         setVertices(prev => prev.map(v => ({ ...v, visited: false})));
-
+        stopRequest.current = false;
         const visited = new Set<string>();
-
         const dfsRec = async (currentId: string) => {
+            if (stopRequest.current) {
+                return;
+            }
             console.log("rec")
             if (visited.has(currentId)) {
                 return;
             };
-
             visited.add(currentId);
-            
             setVertices(prev => prev.map(v => v.id === currentId ? {...v, visited: true} : v));
             await new Promise(resolve => setTimeout(resolve, DELAY));
             const currentVertex = vertices.find(v => v.id === currentId);
@@ -38,15 +39,16 @@ export const useAlgos = (
     };
 
     const stopAnimation = () => {
+        stopRequest.current = true;
         setIsAnimating(false)
         setVertices(prev => prev.map(v => ({ ...v, visited: false})));
-    }
+    };
 
     return {
         dfs,
         isAnimating,
         stopAnimation
-    }
+    };
 };
 
 // const bfs = (fromVertex: string) => {

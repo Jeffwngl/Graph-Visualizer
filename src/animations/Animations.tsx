@@ -1,47 +1,77 @@
-import type { Vertex } from "../types/graphs.types";
-import type { Dispatch, SetStateAction } from "react";
+import type { Coordinate, Vertex } from "../types/graphs.types";
 
-export abstract class Animation {
-    abstract cancel(): void;
-    abstract run(): Promise<void>;
-}
+export type Animation = {
+    cancel: () => void;
+    run: () => Promise<void>;
+};
+
+const circleAnimation = (
+    location: Coordinate,
+    delay: number,
+    color: string
+) => {
+    // placeholder: implement if needed
+    let cancelled = false;
+    let raf = 0;
+    return {
+        run: () => new Promise<void>(resolve => {
+            const start = performance.now();
+            function step(now: number) {
+                if (cancelled) { resolve(); return; }
+                const t = Math.min(1, (now - start) / delay);
+                // could call a render callback here
+                if (t < 1) raf = requestAnimationFrame(step);
+                else resolve();
+            }
+            raf = requestAnimationFrame(step);
+        }),
+        cancel: () => { cancelled = true; cancelAnimationFrame(raf); }
+    } as Animation;
+};
 
 /**
- * Animate a traversal by marking vertices visited in the given order.
- * - `order` is an array of vertex ids in visit order.
- * - `setVertices` is the React state setter for vertices.
- * - `delay` is milliseconds between steps.
- * - `signal` is an optional AbortSignal to cancel the animation early.
+ * Animate a point moving along the line from `fromVertex` to `toVertex`.
+ * - `delay` is total animation duration in ms.
+ * - `color` is provided for the caller to use when drawing.
+ * - `startProgress` is optional initial progress [0..1].
+ * - `onFrame` is an optional callback called each frame with the current position and progress.
  */
-export async function animateTraversal(
-    order: string[],
-    setVertices: Dispatch<SetStateAction<Vertex[]>>,
-    delay: number = 500,
-    signal?: AbortSignal
-) {
-    for (const id of order) {
-        if (signal?.aborted) break;
-        setVertices(prev => prev.map(v => v.id === id ? { ...v, visited: true } : v));
+export function lineAnimation(
+    fromVertex: Vertex,
+    toVertex: Vertex,
+    delay: number,
+    color: string,
+    startProgress: number = 0,
+    onFrame?: (x: number, y: number, progress: number, color?: string) => void
+): Animation {
+    let cancelled = false;
+    let raf = 0;
 
-        // wait for delay or until aborted
-        await new Promise<void>(resolve => {
-            const t = setTimeout(() => resolve(), delay);
-            if (signal) {
-                const onAbort = () => {
-                    clearTimeout(t);
-                    resolve();
-                    signal.removeEventListener('abort', onAbort);
-                };
-                if (signal.aborted) onAbort();
-                else signal.addEventListener('abort', onAbort);
+    const run = () => new Promise<void>(resolve => {
+        const startTime = performance.now();
+        function step(now: number) {
+            if (cancelled) { resolve(); return; }
+            const elapsed = now - startTime;
+            const t = Math.min(1, elapsed / Math.max(1, delay));
+            const progress = startProgress + (1 - startProgress) * t;
+            const x = fromVertex.x + (toVertex.x - fromVertex.x) * progress;
+            const y = fromVertex.y + (toVertex.y - fromVertex.y) * progress;
+            onFrame?.(x, y, progress, color);
+            if (t < 1) {
+                raf = requestAnimationFrame(step);
+            } else {
+                resolve();
             }
-        });
-    }
+        }
+        raf = requestAnimationFrame(step);
+    });
+
+    const cancel = () => { cancelled = true; cancelAnimationFrame(raf); };
+
+    return { run, cancel };
 }
 
-export const animateDFS = animateTraversal;
-export const animateBFS = animateTraversal;
-
-export function clearVisited(setVertices: Dispatch<SetStateAction<Vertex[]>>) {
-    setVertices(prev => prev.map(v => ({ ...v, visited: false })));
-}
+export default {
+    lineAnimation,
+    circleAnimation
+};
