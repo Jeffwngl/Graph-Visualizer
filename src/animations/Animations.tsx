@@ -11,7 +11,7 @@ export const lineAnimation = (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     fromVertex: Vertex,
     toVertex: Vertex,
-    delay: number,
+    delay: number, // FIX BAND AID METHOD
     color: string,
     increment: number
 ): Promise<void> => {

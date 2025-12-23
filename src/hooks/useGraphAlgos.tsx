@@ -16,8 +16,6 @@ export const useAlgos = (
     const stopRequest = useRef(false);
 
     const dfs = async (startId: string) => {
-        console.log("dfs")
-
         setVertices(prev => 
             prev.map(v => ({ ...v, visited: false}))
         );
@@ -53,7 +51,7 @@ export const useAlgos = (
                         canvasRef, 
                         vertices[Number(currentId) - 1], 
                         vertices[Number(v.id) - 1], 
-                        DELAY, 
+                        DELAY,
                         LINECOLOR,
                         SPEED
                     );

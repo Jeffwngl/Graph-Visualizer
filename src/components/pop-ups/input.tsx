@@ -13,10 +13,10 @@ export default function InputSearch( {closePopUp, dfs, reset}: inputProps ) {
     const [algorithm, setAlgorithm] = useState<string>("DFS");
     const [startVertex, setStartVertex] = useState<string>("")
 
-    function isNumber(value?: string | number): boolean {
+    function isNumber(value?: string): boolean {
         return ((value != null) &&
         (value !== '') &&
-        !isNaN(Number(value.toString())));
+        !isNaN(Number(value)));
     };
 
     const runSearch = () => {

@@ -18,6 +18,20 @@ export default function RightMenu() {
                 <p>      dfs(neighbour)</p>
             </div>
         )
+    };
+
+    const bfsDisplay = () => {
+        return (
+            <div className='codeDisplay'>
+                <p>bfs(v):</p>
+                <p>if (visited has current v):</p>
+                <p>   return</p>
+                <p>visited.add(v)</p>
+                <p>for (neighbours in v):</p>
+                <p>   if (neighbour not visited):</p>
+                <p>      dfs(neighbour)</p>
+            </div>
+        )
     }
 
     return (
