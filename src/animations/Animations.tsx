@@ -1,77 +1,59 @@
-import type { Coordinate, Vertex } from "../types/graphs.types";
+import { calculateOffset } from "../hooks/useGeometryCalc";
+import type { Coordinate, Vertex } from "../types/graphs.types"
+import { NODESIZE } from "../types/graphs.types";
 
-export type Animation = {
+export type Animation = { // UNUSED
     cancel: () => void;
     run: () => Promise<void>;
-};
+}
 
 const circleAnimation = (
     location: Coordinate,
     delay: number,
     color: string
 ) => {
-    // placeholder: implement if needed
-    let cancelled = false;
-    let raf = 0;
-    return {
-        run: () => new Promise<void>(resolve => {
-            const start = performance.now();
-            function step(now: number) {
-                if (cancelled) { resolve(); return; }
-                const t = Math.min(1, (now - start) / delay);
-                // could call a render callback here
-                if (t < 1) raf = requestAnimationFrame(step);
-                else resolve();
-            }
-            raf = requestAnimationFrame(step);
-        }),
-        cancel: () => { cancelled = true; cancelAnimationFrame(raf); }
-    } as Animation;
-};
 
-/**
- * Animate a point moving along the line from `fromVertex` to `toVertex`.
- * - `delay` is total animation duration in ms.
- * - `color` is provided for the caller to use when drawing.
- * - `startProgress` is optional initial progress [0..1].
- * - `onFrame` is an optional callback called each frame with the current position and progress.
- */
-export function lineAnimation(
+    
+}
+
+export const lineAnimation = (
+    canvasRef: React.RefObject<HTMLCanvasElement | null>,
     fromVertex: Vertex,
     toVertex: Vertex,
     delay: number,
     color: string,
-    startProgress: number = 0,
-    onFrame?: (x: number, y: number, progress: number, color?: string) => void
-): Animation {
-    let cancelled = false;
-    let raf = 0;
+    increment: number
+): Promise<void> => {
+    let t = 0;
+    const toCoord: Coordinate = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y, NODESIZE, 0);
+    const fromCoord: Coordinate = calculateOffset(toVertex.x, toVertex.y, fromVertex.x, fromVertex.y, NODESIZE, 0);
 
-    const run = () => new Promise<void>(resolve => {
-        const startTime = performance.now();
-        function step(now: number) {
-            if (cancelled) { resolve(); return; }
-            const elapsed = now - startTime;
-            const t = Math.min(1, elapsed / Math.max(1, delay));
-            const progress = startProgress + (1 - startProgress) * t;
-            const x = fromVertex.x + (toVertex.x - fromVertex.x) * progress;
-            const y = fromVertex.y + (toVertex.y - fromVertex.y) * progress;
-            onFrame?.(x, y, progress, color);
+    return new Promise(resolve => {
+        const canvas = canvasRef.current;
+        if (!canvas) return resolve();
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve();
+
+        const animate = () => {
+            const x = fromCoord.x + (toCoord.x - fromCoord.x) * t;
+            const y = fromCoord.y + (toCoord.y - fromCoord.y) * t;
+
+            ctx.beginPath();
+            ctx.moveTo(fromCoord.x, fromCoord.y);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = color;
+            ctx.stroke();
+
             if (t < 1) {
-                raf = requestAnimationFrame(step);
-            } else {
+                t += increment;
+                requestAnimationFrame(animate);
+            } 
+            else {
                 resolve();
-            }
-        }
-        raf = requestAnimationFrame(step);
-    });
-
-    const cancel = () => { cancelled = true; cancelAnimationFrame(raf); };
-
-    return { run, cancel };
-}
-
-export default {
-    lineAnimation,
-    circleAnimation
+            };
+        };
+        requestAnimationFrame(animate);
+    }
+);
 };

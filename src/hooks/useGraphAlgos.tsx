@@ -1,35 +1,64 @@
-import type { Vertex, Edge } from "../types/graphs.types";
+import type { Vertex } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useRef } from "react";
+import { lineAnimation } from "../animations/Animations";
 
 const DELAY = 1000;
+const LINECOLOR = 'orange';
+const SPEED = 0.02;
 
 export const useAlgos = (
     vertices: Vertex[],
     setVertices: Dispatch<SetStateAction<Vertex[]>>,
+    ctx: React.RefObject<HTMLCanvasElement | null>
 ) => {
     const [isAnimating, setIsAnimating] = useState<boolean>(false);
     const stopRequest = useRef(false);
 
     const dfs = async (startId: string) => {
         console.log("dfs")
-        setVertices(prev => prev.map(v => ({ ...v, visited: false})));
+
+        setVertices(prev => 
+            prev.map(v => ({ ...v, visited: false}))
+        );
+
         stopRequest.current = false;
+
+
         const visited = new Set<string>();
+
         const dfsRec = async (currentId: string) => {
             if (stopRequest.current) {
                 return;
-            }
-            console.log("rec")
+            };
             if (visited.has(currentId)) {
                 return;
             };
+
             visited.add(currentId);
-            setVertices(prev => prev.map(v => v.id === currentId ? {...v, visited: true} : v));
+
+            setVertices(prev => 
+                prev.map(v => 
+                    v.id === currentId ? {...v, visited: true} : v
+                )
+            );
+
             await new Promise(resolve => setTimeout(resolve, DELAY));
             const currentVertex = vertices.find(v => v.id === currentId);
+
             if (currentVertex) {
                 for (let v of currentVertex.neighbours) {
+                    if (visited.has(v.id)) continue;
+
+                    await lineAnimation(
+                        ctx, 
+                        vertices[Number(currentId) - 1], 
+                        vertices[Number(v.id) - 1], 
+                        DELAY, 
+                        LINECOLOR,
+                        SPEED
+                    );
+
                     await dfsRec(v.id);
                 };
             };

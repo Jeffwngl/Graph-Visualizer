@@ -1,7 +1,7 @@
 import { use, useEffect, useRef, useState } from "react";
 import EditGraph from "./pop-ups/edit";
 import type { Vertex, Edge, Dimensions } from "../types/graphs.types";
-import { NODESIZE } from "../types/graphs.types";
+import { ARROWHEIGHT, NODESIZE } from "../types/graphs.types";
 import { drawEdge, drawVertex, drawArrow } from "../hooks/useCanvasDraw";
 import { calculateArrow, calculateOffset } from "../hooks/useGeometryCalc";
 import { useMouseHandler } from "../hooks/useMouse";
@@ -69,7 +69,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         dfs,
         isAnimating,
         stopAnimation
-    } = useAlgos(vertices, setVertices);
+    } = useAlgos(vertices, setVertices, canvasRef);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -133,7 +133,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
                     toVertex.x,
                     toVertex.y
                 );
-                const edgePos = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y)
+                const edgePos = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y, NODESIZE, ARROWHEIGHT)
 
                 if (edgePos) {
                     const arrow = calculateArrow(fromVertex.x, fromVertex.y, edgePos.x, edgePos.y);
@@ -186,7 +186,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
             <InputSearch
             closePopUp={ setInputFalse }
             dfs={ dfs }
-            reset={stopAnimation}
+            reset={ stopAnimation }
             />
         )}
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { connectionStart, tempEdge, Arrow, Coordinate, Vertex } from "../types/graphs.types";
+import { type connectionStart, type tempEdge, type Arrow, type Coordinate, type Vertex} from "../types/graphs.types";
+import { NODESIZE, ARROWHEIGHT } from "../types/graphs.types";
 import { checkInVertex, getMousePos } from "./useHelpers";
 import { calculateOffset, calculateArrow } from "./useGeometryCalc"
 
@@ -70,7 +71,7 @@ export const useMouseHandler = (
                         endY: v.y
                     });
                     // add calculate arrow at edge of node
-                    const vertexEdge = calculateOffset(connectingStart.startX, connectingStart.startY, v.x, v.y);
+                    const vertexEdge = calculateOffset(connectingStart.startX, connectingStart.startY, v.x, v.y, NODESIZE, ARROWHEIGHT);
                     if (vertexEdge) {
                         const arrow = calculateArrow(connectingStart.startX, connectingStart.startY, vertexEdge.x, vertexEdge.y);
                         if (arrow) {
