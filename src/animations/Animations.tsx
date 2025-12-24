@@ -1,19 +1,10 @@
-import { calculateOffset } from "../hooks/useGeometryCalc";
 import type { Coordinate, Vertex } from "../types/graphs.types"
-import { NODESIZE } from "../types/graphs.types";
+
+const LINEWIDTH = 6;
 
 export type Animation = { // UNUSED
     cancel: () => void;
     run: () => Promise<void>;
-}
-
-const circleAnimation = (
-    location: Coordinate,
-    delay: number,
-    color: string
-) => {
-
-    
 }
 
 export const lineAnimation = (
@@ -25,8 +16,6 @@ export const lineAnimation = (
     increment: number
 ): Promise<void> => {
     let t = 0;
-    const toCoord: Coordinate = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y, NODESIZE, 0);
-    const fromCoord: Coordinate = calculateOffset(toVertex.x, toVertex.y, fromVertex.x, fromVertex.y, NODESIZE, 0);
 
     return new Promise(resolve => {
         const canvas = canvasRef.current;
@@ -36,12 +25,13 @@ export const lineAnimation = (
         if (!ctx) return resolve();
 
         const animate = () => {
-            const x = fromCoord.x + (toCoord.x - fromCoord.x) * t;
-            const y = fromCoord.y + (toCoord.y - fromCoord.y) * t;
+            const x = fromVertex.x + (toVertex.x - fromVertex.x) * t;
+            const y = fromVertex.y + (toVertex.y - fromVertex.y) * t;
 
             ctx.beginPath();
-            ctx.moveTo(fromCoord.x, fromCoord.y);
+            ctx.moveTo(fromVertex.x, fromVertex.y);
             ctx.lineTo(x, y);
+            ctx.lineWidth = LINEWIDTH;
             ctx.strokeStyle = color;
             ctx.stroke();
 

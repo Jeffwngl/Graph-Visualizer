@@ -10,7 +10,7 @@ const SPEED = 0.02;
 export const useAlgos = (
     vertices: Vertex[],
     setVertices: Dispatch<SetStateAction<Vertex[]>>,
-    ctx: React.RefObject<HTMLCanvasElement | null>
+    canvasRef: React.RefObject<HTMLCanvasElement | null>
 ) => {
     const [isAnimating, setIsAnimating] = useState<boolean>(false);
     const stopRequest = useRef(false);
@@ -23,7 +23,6 @@ export const useAlgos = (
         );
 
         stopRequest.current = false;
-
 
         const visited = new Set<string>();
 
@@ -51,7 +50,7 @@ export const useAlgos = (
                     if (visited.has(v.id)) continue;
 
                     await lineAnimation(
-                        ctx, 
+                        canvasRef, 
                         vertices[Number(currentId) - 1], 
                         vertices[Number(v.id) - 1], 
                         DELAY, 
@@ -68,6 +67,14 @@ export const useAlgos = (
     };
 
     const stopAnimation = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         stopRequest.current = true;
         setIsAnimating(false)
         setVertices(prev => prev.map(v => ({ ...v, visited: false})));

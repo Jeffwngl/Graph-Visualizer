@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditGraph from "./pop-ups/edit";
 import type { Vertex, Edge, Dimensions } from "../types/graphs.types";
 import { ARROWHEIGHT, NODESIZE } from "../types/graphs.types";
@@ -21,6 +21,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const animationRef = useRef<HTMLCanvasElement | null>(null);
 
     const addVertex = (x: number, y: number) => { // TODO: MOVE TO SEPARATE FILE
         const newVertex: Vertex = {
@@ -69,7 +70,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         dfs,
         isAnimating,
         stopAnimation
-    } = useAlgos(vertices, setVertices, canvasRef);
+    } = useAlgos(vertices, setVertices, animationRef);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -97,8 +98,6 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         setEdges([]);
         setVertices([]);
     }
-
-    /* ------------------------------ Main canvas states ------------------------------ */
 
     useEffect(() => {
         drawCanvas();
@@ -204,9 +203,22 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
                 left: 0,
                 width: "100%",
                 height: "calc(100% - 190px)",
-                zIndex: 0,
+                zIndex: 1,
             }}>
             Use a browser that can use HTML Canvas.
+        </canvas>
+        <canvas
+            ref={animationRef} 
+            width={dimensions.width} 
+            height={dimensions.height - 190}
+            style={{
+                position: "absolute",
+                top: 120,
+                left: 0,
+                width: "100%",
+                height: "calc(100% - 190px)",
+                zIndex: 0,
+            }}>
         </canvas>
         </>
     )

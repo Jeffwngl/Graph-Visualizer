@@ -1,4 +1,4 @@
-import { ARROWWIDTH, ARROWHEIGHT, NODESIZE } from "../types/graphs.types";
+import { ARROWWIDTH, ARROWHEIGHT } from "../types/graphs.types";
 import type { Coordinate } from "../types/graphs.types";
 
 export const calculateArrow = (

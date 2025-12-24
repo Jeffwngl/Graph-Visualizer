@@ -4,7 +4,7 @@ import type { Vertex, Coordinate } from "../types/graphs.types";
 export const drawVertex = (ctx: CanvasRenderingContext2D, v: Vertex) => {
     ctx.beginPath();
     ctx.arc(v.x, v.y, NODESIZE, 0, 2 * Math.PI);
-    ctx.fillStyle = v.visited ? "#ba1212ff" : "#ffffffff";
+    ctx.fillStyle = v.visited ? "#d9841dff" : "#ffffffff";
     ctx.fill();
     ctx.strokeStyle = "#000000ff";
     ctx.lineWidth = 3;
