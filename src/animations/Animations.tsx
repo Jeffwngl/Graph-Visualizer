@@ -25,7 +25,7 @@ export const circleAnimation = (
             }
             ctx.beginPath();
             ctx.arc(Vertex.x, Vertex.y, NODESIZE, 0, Math.PI * 2, false)
-            ctx.strokeStyle = `rgba(10, 230, 40, ${alpha})`;
+            ctx.strokeStyle = `rgba(76, 245, 93, ${alpha})`;
             ctx.lineWidth = 3;
             ctx.stroke();
 
@@ -64,6 +64,8 @@ export const lineAnimation = (
             if (stopRequest.current) {
                 return resolve();
             }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             const x = fromVertex.x + (toVertex.x - fromVertex.x) * t;
             const y = fromVertex.y + (toVertex.y - fromVertex.y) * t;
 

@@ -2,6 +2,7 @@ import type { Vertex } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useRef, useEffect } from "react";
 import { lineAnimation, circleAnimation } from "../animations/Animations";
+import type { Step } from "../types/graphs.types";
 
 const DELAY = 1000;
 const LINECOLOR = 'orange';
@@ -28,6 +29,46 @@ export const useAlgos = (
     useEffect(() => {
         console.log(isPaused)
     }, [isPaused])
+
+    const generateDfsSteps = (
+        startId: string
+    ): Step[] => {
+        const visited = new Set<string>();
+        const steps: Step[] = [];
+
+        const dfsRec = async (currentId: string) => {
+            if (visited.has(currentId)) {
+                return;
+            };
+
+            visited.add(currentId);
+            steps.push({ type: "visit", id: currentId })
+
+            setVertices(prev => 
+                prev.map(v => 
+                    v.id === currentId ? {...v, visited: true} : v
+                )
+            );
+
+            const currentVertex = vertices.find(v => v.id === currentId);
+
+            if (currentVertex) {
+                for (let v of currentVertex.neighbours) {
+
+                    if (visited.has(v.id)) {
+                        steps.push({ type: "edge", from: currentId, to: v.id })
+                        continue;
+                    }
+
+                    dfsRec(v.id);
+
+                    steps.push({ type: "backtrack", id: currentId })
+                };
+            };
+        };
+        steps.push({ type: "finish" })
+        return steps;
+    }
 
     const dfs = async (startId: string) => {
         setVertices(prev => 

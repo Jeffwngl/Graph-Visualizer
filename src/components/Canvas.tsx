@@ -93,8 +93,29 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
             height: window.innerHeight,
             width: window.innerWidth
         })
-        drawCanvas();
-    }
+    };
+
+    const resizeCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const edgeCanvas = edgeCanvasRef.current
+        if (!edgeCanvas) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+
+        canvas.width, edgeCanvas.width = rect.width * dpr;
+        canvas.height, edgeCanvas.height = rect.height * dpr;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const ctxEdge = edgeCanvas.getContext("2d");
+        if (!ctxEdge) return;
+
+        ctx.scale(dpr, dpr);
+        ctxEdge.scale(dpr, dpr);
+    };
 
     const eraseNodes = () => { // TODO: MOVE TO SEPARATE FILE
         setEdges([]);
@@ -107,7 +128,13 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
 
     useEffect(() => {
         window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     });
+
+    useEffect(() => {
+        resizeCanvas();
+        drawCanvas();
+    }, [dimensions]);
 
     const drawCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;

@@ -49,3 +49,9 @@ export type canvasProps = {
     editing: boolean;
     setEdit: () => void;
 }
+
+export type Step = 
+    | { type: "visit"; id: string }
+    | { type: "edge"; from: string; to: string}
+    | { type: "backtrack"; id: string }
+    | { type: "finish"}
