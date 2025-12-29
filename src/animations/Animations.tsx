@@ -1,11 +1,13 @@
 import type { Coordinate, Vertex } from "../types/graphs.types"
 import { NODESIZE } from "../types/graphs.types";
+import { useRef } from "react";
 
 const LINEWIDTH = 6;
 
 export const circleAnimation = (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     Vertex: Vertex,
+    stopRequest: React.RefObject<boolean>
 ): Promise<void> => {
     return new Promise(resolve => {
         const canvas = canvasRef.current;
@@ -18,6 +20,9 @@ export const circleAnimation = (
         let increment = 0.02;
 
         const animate = () => {
+            if (stopRequest.current) {
+                return resolve();
+            }
             ctx.beginPath();
             ctx.arc(Vertex.x, Vertex.y, NODESIZE, 0, Math.PI * 2, false)
             ctx.strokeStyle = `rgba(10, 230, 40, ${alpha})`;
@@ -25,7 +30,7 @@ export const circleAnimation = (
             ctx.stroke();
 
             alpha += increment;
-            
+
             if (alpha < 1) {
                 requestAnimationFrame(animate);
             }
@@ -43,7 +48,8 @@ export const lineAnimation = (
     toVertex: Vertex,
     delay: number, // FIX BAND AID METHOD
     color: string,
-    increment: number
+    increment: number,
+    stopRequest: React.RefObject<boolean>
 ): Promise<void> => {
     let t = 0;
 
@@ -55,6 +61,9 @@ export const lineAnimation = (
         if (!ctx) return resolve();
 
         const animate = () => {
+            if (stopRequest.current) {
+                return resolve();
+            }
             const x = fromVertex.x + (toVertex.x - fromVertex.x) * t;
             const y = fromVertex.y + (toVertex.y - fromVertex.y) * t;
 

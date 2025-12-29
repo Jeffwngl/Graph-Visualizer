@@ -61,16 +61,17 @@ export const useAlgos = (
                         vertices[Number(v.id) - 1], 
                         DELAY,
                         LINECOLOR,
-                        SPEED
+                        SPEED,
+                        stopRequest
                     );
 
                     await dfsRec(v.id);
                     setCurrentCall(`Backtracking from neighbor vertex ${v.id} to ${currentId}`);
                     await circleAnimation(
                         nodeCanvasRef,
-                        vertices[Number(currentId) - 1]
+                        vertices[Number(currentId) - 1],
+                        stopRequest
                     )
-                    // await new Promise(resolve => setTimeout(resolve, DELAY));
                 };
             };
         };
