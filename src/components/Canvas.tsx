@@ -13,9 +13,10 @@ type canvasProps = {
     inputing: boolean;
     setEditFalse: () => void;
     setInputFalse: () => void;
+    setAlgo: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}: canvasProps ) {
+export default function Canvas( {editing, inputing, setEditFalse, setInputFalse, setAlgo}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
@@ -68,8 +69,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
     
     const {
         dfs,
-        isAnimating,
-        stopAnimation
+        endAnimation
     } = useAlgos(vertices, setVertices, animationRef);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
@@ -184,8 +184,9 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse}
         {inputing && (
             <InputSearch
             closePopUp={ setInputFalse }
-            dfs={ dfs }
-            reset={ stopAnimation }
+            dfsRec={ dfs }
+            reset={ endAnimation }
+            setAlgo={ setAlgo }
             />
         )}
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import './App.css'
 import HeroMenu from './components/HeroMenu'
 import BottomMenu from './components/BottomMenu'
@@ -8,18 +8,23 @@ import Canvas from './components/Canvas'
 
 function App() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isInputing, setIsInputing] = useState<boolean>(true);
+  const [isInputing, setIsInputing] = useState<boolean>(false);
+  const [useAlgo, setAlgo] = useState<string>("DFSrecursive");
 
   useEffect(() => {
     console.log("isEditing:", isEditing);
   }, [isEditing]);
+
+  useEffect(() => {
+    console.log(useAlgo);
+  }, [useAlgo]);
 
   return (
     <>
       <HeroMenu />
       <div className='Main'>
 
-        <LeftMenu 
+        <LeftMenu
             editOnToggle={ () => {
               if (!isInputing) {
                 setIsEditing(true);
@@ -37,9 +42,12 @@ function App() {
           inputing={ isInputing }
           setEditFalse={ () => setIsEditing(false) }
           setInputFalse={ () => setIsInputing(false) }
+          setAlgo={ setAlgo }
         />
 
-        <RightMenu />
+        <RightMenu 
+            displayedAlgo={ useAlgo }
+        />
 
       </div>
       <BottomMenu />

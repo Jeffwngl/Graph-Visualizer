@@ -64,7 +64,7 @@ export const useAlgos = (
         setIsAnimating(false);
     };
 
-    const stopAnimation = () => {
+    const endAnimation = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -80,8 +80,7 @@ export const useAlgos = (
 
     return {
         dfs,
-        isAnimating,
-        stopAnimation
+        endAnimation
     };
 };
 
