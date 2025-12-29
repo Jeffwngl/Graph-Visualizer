@@ -105,8 +105,11 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
 
-        canvas.width, edgeCanvas.width = rect.width * dpr;
-        canvas.height, edgeCanvas.height = rect.height * dpr;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+
+        edgeCanvas.width = rect.width * dpr;
+        edgeCanvas.height = rect.height * dpr;
 
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
@@ -120,7 +123,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const eraseNodes = () => { // TODO: MOVE TO SEPARATE FILE
         setEdges([]);
         setVertices([]);
-    }
+    };
 
     useEffect(() => {
         drawCanvas();
