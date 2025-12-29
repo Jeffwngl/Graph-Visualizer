@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import HeroMenu from './components/HeroMenu'
 import BottomMenu from './components/BottomMenu'
@@ -11,6 +11,8 @@ function App() {
   const [isInputing, setIsInputing] = useState<boolean>(false);
   const [useAlgo, setAlgo] = useState<string>("DFSrecursive");
   const [currentCall, setCurrentCall] = useState<string>("");
+
+  const isPaused = useRef<boolean>(true);
  
   useEffect(() => {
     console.log("isEditing:", isEditing);
@@ -45,6 +47,7 @@ function App() {
           setInputFalse={ () => setIsInputing(false) }
           setAlgo={ setAlgo }
           setCurrentCall={ setCurrentCall }
+          isPaused={ isPaused }
         />
 
         <RightMenu 
@@ -53,7 +56,9 @@ function App() {
         />
 
       </div>
-      <BottomMenu />
+      <BottomMenu 
+        isPaused={ isPaused }
+      />
     </>
   )
 }

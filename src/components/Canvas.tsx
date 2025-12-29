@@ -15,9 +15,10 @@ type canvasProps = {
     setInputFalse: () => void;
     setAlgo: React.Dispatch<React.SetStateAction<string>>;
     setCurrentCall: React.Dispatch<React.SetStateAction<string>>;
+    isPaused: React.RefObject<boolean>;
 }
 
-export default function Canvas( {editing, inputing, setEditFalse, setInputFalse, setAlgo, setCurrentCall}: canvasProps ) {
+export default function Canvas( {editing, inputing, setEditFalse, setInputFalse, setAlgo, setCurrentCall, isPaused}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
@@ -53,7 +54,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
             if (v.id === fromId) {
                 if (toVertex) {
                     v.neighbours.push(toVertex);
-                }
+                };
                 break;
             }
         }
@@ -71,7 +72,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const {
         dfs,
         endAnimation
-    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef);
+    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef, isPaused);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;

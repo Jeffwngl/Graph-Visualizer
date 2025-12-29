@@ -61,4 +61,4 @@ export default function InputSearch( {closePopUp, dfsRec, reset, setAlgo}: input
             }}>Search</button>
         </div>
     )
-}
+};

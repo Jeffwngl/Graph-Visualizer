@@ -2,12 +2,16 @@ import { useState } from "react"
 import "./BottomMenu.css"
 import { PlayIcon, PauseIcon, SkipIcon, RewindIcon } from "../assets/Icons";
 
-export default function BottomMenu() {
+type bottomMenuProps = {
+    isPaused: React.RefObject<boolean>
+}
+
+export default function BottomMenu({ isPaused }: bottomMenuProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     function playPause() {
         setIsPlaying(!isPlaying);
-    }
+    };
 
     return (
         <div className="BottomBar">
@@ -26,6 +30,7 @@ export default function BottomMenu() {
                 </button>
                 <button id="play"
                 onClick={() => {
+                    isPaused.current = !isPlaying;
                     playPause();
                     console.log("isPlaying: " + isPlaying);
                 }}
