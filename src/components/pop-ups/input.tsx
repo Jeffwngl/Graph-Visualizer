@@ -48,14 +48,17 @@ export default function InputSearch( {closePopUp, dfsRec, reset, setAlgo}: input
                 reset();
             }}>Close</button>
             <p>Search Algorithm:</p>
-            <select name="algorithm" id="algorithm" value={algorithm} onChange={e => setAlgorithm(e.target.value)}>
+            <select name="algorithm" value={algorithm} onChange={e => setAlgorithm(e.target.value)}>
                 <option value="DFSrecursive">DFS Recursive</option>
                 <option value="DFSiterative">DFS Iterative</option>
                 <option value="BFS">BFS</option>
             </select>
             <p>Select Starting Vertex:</p>
             <input value={startVertex} placeholder="Vertex Number" onChange={e => setStartVertex(e.target.value)}></input>
-            <button className="inputButton" onClick={runSearch}>Search</button>
+            <button className="inputButton" onClick={ () => {
+                reset();
+                runSearch();
+            }}>Search</button>
         </div>
     )
 }

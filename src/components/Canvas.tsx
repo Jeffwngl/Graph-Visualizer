@@ -14,15 +14,16 @@ type canvasProps = {
     setEditFalse: () => void;
     setInputFalse: () => void;
     setAlgo: React.Dispatch<React.SetStateAction<string>>;
+    setCurrentCall: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Canvas( {editing, inputing, setEditFalse, setInputFalse, setAlgo}: canvasProps ) {
+export default function Canvas( {editing, inputing, setEditFalse, setInputFalse, setAlgo, setCurrentCall}: canvasProps ) {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const animationRef = useRef<HTMLCanvasElement | null>(null);
+    const edgeCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const addVertex = (x: number, y: number) => { // TODO: MOVE TO SEPARATE FILE
         const newVertex: Vertex = {
@@ -70,7 +71,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const {
         dfs,
         endAnimation
-    } = useAlgos(vertices, setVertices, animationRef);
+    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -209,7 +210,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
             Use a browser that can use HTML Canvas.
         </canvas>
         <canvas
-            ref={animationRef} 
+            ref={edgeCanvasRef} 
             width={dimensions.width} 
             height={dimensions.height - 190}
             style={{

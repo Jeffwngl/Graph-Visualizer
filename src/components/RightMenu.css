@@ -3,7 +3,7 @@
   background-color: black;
   color: white;
   width: 400px;
-  height: 400px;
+  height: 500px;
   transition: width 0.3s ease;
   overflow: hidden;
   display: flex;
@@ -30,10 +30,12 @@
   background-color: #c54c67;
 }
 
+.section {
+  padding-left: 20px;
+}
+
 .codeDisplay {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 14px;
+  font-size: 12px;
   white-space: pre;
-  padding-left: 30px;
-  padding-top: 60px;
 }

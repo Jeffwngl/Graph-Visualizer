@@ -1,11 +1,41 @@
 import type { Coordinate, Vertex } from "../types/graphs.types"
+import { NODESIZE } from "../types/graphs.types";
 
 const LINEWIDTH = 6;
 
-export type Animation = { // UNUSED
-    cancel: () => void;
-    run: () => Promise<void>;
-}
+export const circleAnimation = (
+    canvasRef: React.RefObject<HTMLCanvasElement | null>,
+    Vertex: Vertex,
+): Promise<void> => {
+    return new Promise(resolve => {
+        const canvas = canvasRef.current;
+        if (!canvas) return resolve();
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve();
+
+        let alpha = 0;
+        let increment = 0.02;
+
+        const animate = () => {
+            ctx.beginPath();
+            ctx.arc(Vertex.x, Vertex.y, NODESIZE, 0, Math.PI * 2, false)
+            ctx.strokeStyle = `rgba(10, 230, 40, ${alpha})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            alpha += increment;
+            
+            if (alpha < 1) {
+                requestAnimationFrame(animate);
+            }
+            else {
+                resolve();
+            }
+        }
+        animate();
+    })
+};
 
 export const lineAnimation = (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
@@ -44,6 +74,5 @@ export const lineAnimation = (
             };
         };
         requestAnimationFrame(animate);
-    }
-);
+    })
 };

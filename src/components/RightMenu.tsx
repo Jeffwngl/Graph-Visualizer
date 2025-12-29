@@ -4,9 +4,10 @@ import { useState } from "react"
 
 type rightMenuProps = {
     displayedAlgo: string;
+    displayedCall: string;
 }
 
-export default function RightMenu({ displayedAlgo }: rightMenuProps) {
+export default function RightMenu({ displayedAlgo, displayedCall }: rightMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     const dfsRecDisplay = () => {
@@ -36,7 +37,7 @@ export default function RightMenu({ displayedAlgo }: rightMenuProps) {
                 <p>             stack.append(neighbour)</p>
             </div>
         )
-    }
+    };
 
     const bfsDisplay = () => {
         return (
@@ -50,22 +51,27 @@ export default function RightMenu({ displayedAlgo }: rightMenuProps) {
                 <p>         queue.push(neighbour)</p>
             </div>
         )
-    }
+    };
 
     return (
         <div className={`RightMenu ${isOpen ? "open" : "closed"}`}>
             <button className="ToggleRight" id="toggleRight" onClick={() => setIsOpen(!isOpen)}>{isOpen ? <RightArrowIcon /> : <LeftArrowIcon /> }</button>
             {isOpen && (
-                <div className="StepsMenu">
-                    {displayedAlgo === "DFSrecursive" && (
-                        dfsRecDisplay()
-                    )}
-                    {displayedAlgo === "DFSiterative" && (
-                        dfsIterDisplay()
-                    )}
-                    {displayedAlgo === "BFS" && (
-                        bfsDisplay()
-                    )}
+                <div className="section">
+                    <p>Function</p>
+                    <div className="StepsMenu">
+                        {displayedAlgo === "DFSrecursive" && (
+                            dfsRecDisplay()
+                        )}
+                        {displayedAlgo === "DFSiterative" && (
+                            dfsIterDisplay()
+                        )}
+                        {displayedAlgo === "BFS" && (
+                            bfsDisplay()
+                        )}
+                    </div>
+                    <p>Call Stack</p>
+                    <p className="codeDisplay">{ displayedCall }</p>
                 </div>
             )}
         </div>

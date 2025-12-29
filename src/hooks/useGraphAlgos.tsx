@@ -1,7 +1,7 @@
 import type { Vertex } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useRef } from "react";
-import { lineAnimation } from "../animations/Animations";
+import { lineAnimation, circleAnimation } from "../animations/Animations";
 
 const DELAY = 1000;
 const LINECOLOR = 'orange';
@@ -10,7 +10,9 @@ const SPEED = 0.02;
 export const useAlgos = (
     vertices: Vertex[],
     setVertices: Dispatch<SetStateAction<Vertex[]>>,
-    canvasRef: React.RefObject<HTMLCanvasElement | null>
+    setCurrentCall: Dispatch<SetStateAction<string>>,
+    edgeCanvasRef: React.RefObject<HTMLCanvasElement | null>,
+    nodeCanvasRef: React.RefObject<HTMLCanvasElement | null>
 ) => {
     const [isAnimating, setIsAnimating] = useState<boolean>(false);
     const stopRequest = useRef(false);
@@ -34,6 +36,8 @@ export const useAlgos = (
 
             visited.add(currentId);
 
+            setCurrentCall(`Visiting vertex ${currentId}`);
+
             setVertices(prev => 
                 prev.map(v => 
                     v.id === currentId ? {...v, visited: true} : v
@@ -45,10 +49,14 @@ export const useAlgos = (
 
             if (currentVertex) {
                 for (let v of currentVertex.neighbours) {
-                    if (visited.has(v.id)) continue;
-
+                    if (visited.has(v.id)) {
+                        setCurrentCall(`Neighbour ${v.id} already visited, skipping.`);
+                        await new Promise(resolve => setTimeout(resolve, DELAY));
+                        continue;
+                    }
+                    setCurrentCall(`Checking neighbour ${v.id}`)
                     await lineAnimation(
-                        canvasRef, 
+                        edgeCanvasRef, 
                         vertices[Number(currentId) - 1], 
                         vertices[Number(v.id) - 1], 
                         DELAY,
@@ -57,15 +65,22 @@ export const useAlgos = (
                     );
 
                     await dfsRec(v.id);
+                    setCurrentCall(`Backtracking from neighbor vertex ${v.id} to ${currentId}`);
+                    await circleAnimation(
+                        nodeCanvasRef,
+                        vertices[Number(currentId) - 1]
+                    )
+                    // await new Promise(resolve => setTimeout(resolve, DELAY));
                 };
             };
         };
         await dfsRec(startId);
+        setCurrentCall("Finished.")
         setIsAnimating(false);
     };
 
     const endAnimation = () => {
-        const canvas = canvasRef.current;
+        const canvas = edgeCanvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');

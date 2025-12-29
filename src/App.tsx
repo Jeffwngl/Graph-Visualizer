@@ -10,7 +10,8 @@ function App() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isInputing, setIsInputing] = useState<boolean>(false);
   const [useAlgo, setAlgo] = useState<string>("DFSrecursive");
-
+  const [currentCall, setCurrentCall] = useState<string>("");
+ 
   useEffect(() => {
     console.log("isEditing:", isEditing);
   }, [isEditing]);
@@ -43,10 +44,12 @@ function App() {
           setEditFalse={ () => setIsEditing(false) }
           setInputFalse={ () => setIsInputing(false) }
           setAlgo={ setAlgo }
+          setCurrentCall={ setCurrentCall }
         />
 
         <RightMenu 
             displayedAlgo={ useAlgo }
+            displayedCall={ currentCall }
         />
 
       </div>
