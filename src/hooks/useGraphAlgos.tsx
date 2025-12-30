@@ -1,4 +1,4 @@
-import type { Vertex } from "../types/graphs.types";
+import type { Vertex, Edge } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useRef, useEffect } from "react";
 import { lineAnimation, circleAnimation } from "../animations/Animations";
@@ -14,9 +14,9 @@ export const useAlgos = (
     setCurrentCall: Dispatch<SetStateAction<string>>,
     edgeCanvasRef: React.RefObject<HTMLCanvasElement | null>,
     nodeCanvasRef: React.RefObject<HTMLCanvasElement | null>,
-    isPaused: React.RefObject<boolean>
+    isPaused: React.RefObject<boolean>,
+    edgeRefs: React.RefObject<Edge[]>
 ) => {
-    const [isAnimating, setIsAnimating] = useState<boolean>(false);
     const stopRequest = useRef(false);
 
     const waitIfPaused = async () => {
@@ -30,7 +30,7 @@ export const useAlgos = (
         console.log(isPaused)
     }, [isPaused])
 
-    const generateDfsSteps = (
+    const generateDfsSteps = ( // TODO: Finish
         startId: string
     ): Step[] => {
         const visited = new Set<string>();
@@ -70,7 +70,7 @@ export const useAlgos = (
         return steps;
     }
 
-    const dfs = async (startId: string) => {
+    const dfs = async (startId: string) => { // PREVIOUS FUNCTION
         setVertices(prev => 
             prev.map(v => ({ ...v, visited: false}))
         );
@@ -123,7 +123,9 @@ export const useAlgos = (
                         DELAY,
                         LINECOLOR,
                         SPEED,
-                        stopRequest
+                        stopRequest,
+                        vertices,
+                        edgeRefs
                     );
 
                     await dfsRec(v.id);
@@ -141,7 +143,7 @@ export const useAlgos = (
         };
         await dfsRec(startId);
         setCurrentCall("Finished.")
-        setIsAnimating(false);
+        edgeRefs.current = [];
     };
 
     const endAnimation = () => {
@@ -154,7 +156,7 @@ export const useAlgos = (
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         stopRequest.current = true;
-        setIsAnimating(false)
+        edgeRefs.current = [];
         setVertices(prev => prev.map(v => ({ ...v, visited: false})));
     };
 

@@ -70,7 +70,7 @@ export default function RightMenu({ displayedAlgo, displayedCall }: rightMenuPro
                             bfsDisplay()
                         )}
                     </div>
-                    <p>Call Stack</p>
+                    <p>Current Call</p>
                     <p className="codeDisplay">{ displayedCall }</p>
                 </div>
             )}

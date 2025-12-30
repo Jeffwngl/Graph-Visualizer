@@ -22,7 +22,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
-
+    const drawEdgeRef = useRef<Edge[]>([]);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const edgeCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -72,7 +72,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const {
         dfs,
         endAnimation
-    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef, isPaused);
+    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef, isPaused, drawEdgeRef);
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -162,7 +162,9 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
                     fromVertex.x,
                     fromVertex.y,
                     toVertex.x,
-                    toVertex.y
+                    toVertex.y,
+                    "black",
+                    2
                 );
                 const edgePos = calculateOffset(fromVertex.x, fromVertex.y, toVertex.x, toVertex.y, NODESIZE, ARROWHEIGHT)
 
@@ -185,7 +187,9 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
                 tempEdge.startX,
                 tempEdge.startY,
                 tempEdge.endX,
-                tempEdge.endY
+                tempEdge.endY,
+                "black",
+                2
             );
         };
 
