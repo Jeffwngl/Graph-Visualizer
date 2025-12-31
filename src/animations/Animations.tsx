@@ -1,6 +1,5 @@
-import type { Coordinate, Vertex, Edge } from "../types/graphs.types"
+import type { Vertex, Edge } from "../types/graphs.types"
 import { NODESIZE } from "../types/graphs.types";
-import { useEffect } from "react";
 import { drawEdge } from "../hooks/useCanvasDraw";
 
 const LINEWIDTH = 6;

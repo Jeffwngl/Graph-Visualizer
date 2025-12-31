@@ -1,6 +1,6 @@
 import type { Vertex, Edge } from "../types/graphs.types";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
 import { lineAnimation, circleAnimation } from "../animations/Animations";
 import type { Step } from "../types/graphs.types";
 
@@ -20,23 +20,18 @@ export const useAlgos = (
     const stopRequest = useRef(false);
 
     const waitIfPaused = async () => {
-        console.log("paused");
         while (isPaused.current === true) {
             await new Promise(resolve => setTimeout(resolve, 50));
         }
     }
 
-    useEffect(() => {
-        console.log(isPaused)
-    }, [isPaused])
-
-    const generateDfsSteps = ( // TODO: Finish
+    const generateDfsSteps = (
         startId: string
     ): Step[] => {
         const visited = new Set<string>();
         const steps: Step[] = [];
 
-        const dfsRec = async (currentId: string) => {
+        const dfsRec = (currentId: string) => {
             if (visited.has(currentId)) {
                 return;
             };
@@ -44,21 +39,15 @@ export const useAlgos = (
             visited.add(currentId);
             steps.push({ type: "visit", id: currentId })
 
-            setVertices(prev => 
-                prev.map(v => 
-                    v.id === currentId ? {...v, visited: true} : v
-                )
-            );
-
             const currentVertex = vertices.find(v => v.id === currentId);
 
             if (currentVertex) {
                 for (let v of currentVertex.neighbours) {
-
                     if (visited.has(v.id)) {
-                        steps.push({ type: "edge", from: currentId, to: v.id })
                         continue;
                     }
+
+                    steps.push({ type: "edge", from: currentId, to: v.id })
 
                     dfsRec(v.id);
 
@@ -66,60 +55,41 @@ export const useAlgos = (
                 };
             };
         };
+        dfsRec(startId);
         steps.push({ type: "finish" })
         return steps;
-    }
+    };
 
-    const dfs = async (startId: string) => { // PREVIOUS FUNCTION
-        setVertices(prev => 
-            prev.map(v => ({ ...v, visited: false}))
-        );
-
+    const executeTraversal = async (
+        steps: Step[]
+    ) => {
         stopRequest.current = false;
-
-        const visited = new Set<string>();
-
-        const dfsRec = async (currentId: string) => {
-            if (stopRequest.current) {
-                return;
-            };
-            if (visited.has(currentId)) {
-                return;
-            };
+        for (const item of steps) {
+            if (stopRequest.current) return;
 
             await waitIfPaused();
 
-            visited.add(currentId);
+            switch (item.type) {
+                case "visit": {
+                    setCurrentCall(`Visiting Vertex ${ item.id }.`);
 
-            setCurrentCall(`Visiting vertex ${currentId}`);
+                    setVertices(prev => 
+                        prev.map(v => 
+                            v.id === item.id ? {...v, visited: true} : v
+                        )
+                    );
 
-            setVertices(prev => 
-                prev.map(v => 
-                    v.id === currentId ? {...v, visited: true} : v
-                )
-            );
+                    await new Promise(resolve => setTimeout(resolve, DELAY));
+                    break;
+                }
 
-            await new Promise(resolve => setTimeout(resolve, DELAY));
-            const currentVertex = vertices.find(v => v.id === currentId);
-
-            if (currentVertex) {
-                for (let v of currentVertex.neighbours) {
-
-                    await waitIfPaused();
-
-                    if (visited.has(v.id)) {
-                        setCurrentCall(`Neighbour ${v.id} already visited, skipping.`);
-                        await new Promise(resolve => setTimeout(resolve, DELAY));
-                        continue;
-                    }
-                    setCurrentCall(`Checking neighbour ${v.id}`)
-
-                    await waitIfPaused();
+                case "edge": {
+                    setCurrentCall(`Checking neighbour ${ item.to }`)
 
                     await lineAnimation(
                         edgeCanvasRef, 
-                        vertices[Number(currentId) - 1], 
-                        vertices[Number(v.id) - 1], 
+                        vertices[Number(item.from) - 1], 
+                        vertices[Number(item.to) - 1], 
                         DELAY,
                         LINECOLOR,
                         SPEED,
@@ -128,22 +98,28 @@ export const useAlgos = (
                         edgeRefs
                     );
 
-                    await dfsRec(v.id);
+                    break;
+                }
 
-                    await waitIfPaused();
-
-                    setCurrentCall(`Backtracking from neighbor vertex ${v.id} to ${currentId}`);
+                case "backtrack": {
+                    setCurrentCall(`Backtracking from neighbour vertex to ${ item.id }`);
+                    
                     await circleAnimation(
                         nodeCanvasRef,
-                        vertices[Number(currentId) - 1],
+                        vertices[Number(item.id) - 1],
                         stopRequest
                     )
-                };
-            };
-        };
-        await dfsRec(startId);
-        setCurrentCall("Finished.")
-        edgeRefs.current = [];
+
+                    break;
+                }
+
+                case "finish": {
+                    setCurrentCall(`Finished.`);
+                    edgeRefs.current = [];
+                    break;
+                }
+            }
+        }
     };
 
     const endAnimation = () => {
@@ -161,7 +137,8 @@ export const useAlgos = (
     };
 
     return {
-        dfs,
+        generateDfsSteps,
+        executeTraversal,
         endAnimation
     };
 };

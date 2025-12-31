@@ -40,15 +40,13 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
 
     const addEdge = (fromId: string, toId: string) => { // TODO: MOVE TO SEPARATE FILE
         setEdges(prev => [...prev, { from: fromId, to: toId }]);
-        // console.log("edge from: " + fromId)
-        // console.log("edge to: " + toId)
 
         let toVertex;
         for (let v of vertices) {
             if (v.id === toId) {
                 toVertex = v;
             }
-        }
+        };
 
         for (let v of vertices) {
             if (v.id === fromId) {
@@ -57,7 +55,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
                 };
                 break;
             }
-        }
+        };
     };
 
     const {
@@ -70,7 +68,8 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     } = useMouseHandler(vertices, canvasRef, editing, inputing, addVertex, addEdge);
     
     const {
-        dfs,
+        generateDfsSteps,
+        executeTraversal,
         endAnimation
     } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef, isPaused, drawEdgeRef);
 
@@ -220,7 +219,8 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
         {inputing && (
             <InputSearch
             closePopUp={ setInputFalse }
-            dfsRec={ dfs }
+            generateDfsSteps={ generateDfsSteps }
+            executeDfs={ executeTraversal }
             reset={ endAnimation }
             setAlgo={ setAlgo }
             />

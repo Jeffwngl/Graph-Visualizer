@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import type { Step } from '../../types/graphs.types';
 import './input.css'
 
 type inputProps = {
     closePopUp: () => void;
-    dfsRec: (startVertex: string) => void;
+    generateDfsSteps: (startVertex: string) => Step[];
+    executeDfs: (steps: Step[]) => void;
     // dfsIter: (startVertex: string) => void;
     // bfs: () => void;
     // djikstras: () => void;
@@ -11,7 +13,13 @@ type inputProps = {
     setAlgo: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function InputSearch( {closePopUp, dfsRec, reset, setAlgo}: inputProps ) {
+export default function InputSearch( {
+        closePopUp, 
+        generateDfsSteps,
+        executeDfs, 
+        reset, 
+        setAlgo
+    }: inputProps ) {
     const [algorithm, setAlgorithm] = useState<string>("DFSrecursive");
     const [startVertex, setStartVertex] = useState<string>("")
 
@@ -26,7 +34,8 @@ export default function InputSearch( {closePopUp, dfsRec, reset, setAlgo}: input
             return;
         };
         if (algorithm === "DFSrecursive") {
-            dfsRec(startVertex.trim());
+            const steps = generateDfsSteps(startVertex.trim());
+            executeDfs(steps);
         } else if (algorithm === "DFSiterative") {
             // TODO: implement iterative version
             return;

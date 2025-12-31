@@ -12,7 +12,7 @@ function App() {
   const [useAlgo, setAlgo] = useState<string>("DFSrecursive");
   const [currentCall, setCurrentCall] = useState<string>("");
 
-  const isPaused = useRef<boolean>(true);
+  const isPaused = useRef<boolean>(false);
  
   useEffect(() => {
     console.log("isEditing:", isEditing);
