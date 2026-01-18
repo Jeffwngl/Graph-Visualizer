@@ -2,6 +2,10 @@ export const NODESIZE = 20;
 export const ARROWHEIGHT = 10;
 export const ARROWWIDTH = 5;
 
+export const DELAY = 1000;
+export const LINECOLOR = 'orange';
+export const SPEED = 0.02;
+
 export type Vertex = {
     id: string;
     width: number;

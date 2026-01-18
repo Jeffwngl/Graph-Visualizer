@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import EditGraph from "./pop-ups/edit";
-import type { Vertex, Edge, Dimensions } from "../types/graphs.types";
+import type { Vertex, Edge, Dimensions, Step } from "../types/graphs.types";
 import { ARROWHEIGHT, NODESIZE } from "../types/graphs.types";
 import { drawEdge, drawVertex, drawArrow } from "../hooks/useCanvasDraw";
 import { calculateArrow, calculateOffset } from "../hooks/useGeometryCalc";
 import { useMouseHandler } from "../hooks/useMouse";
 import { useAlgos } from "../hooks/useGraphAlgos";
 import InputSearch from "./pop-ups/input";
+import { useController } from "../hooks/useController";
 
 type canvasProps = {
     editing: boolean;
@@ -23,8 +24,10 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     const [edges, setEdges] = useState<Edge[]>([]);
     const [dimensions, setDimensions] = useState<Dimensions>({ height: window.innerHeight, width: window.innerWidth});
     const drawEdgeRef = useRef<Edge[]>([]);
+    const drawVertexRef = useRef<Vertex[]>([]); // TODO: Finish Implementing this
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const edgeCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const steps = useRef<Step[]>([]);
 
     const addVertex = (x: number, y: number) => { // TODO: MOVE TO SEPARATE FILE
         const newVertex: Vertex = {
@@ -69,9 +72,37 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
     
     const {
         generateDfsSteps,
+        // executeTraversal,
+        endAnimation,
+        stopRequest
+    } = useAlgos(
+        vertices, 
+        setVertices, 
+        setCurrentCall, 
+        edgeCanvasRef, 
+        canvasRef, 
+        isPaused, 
+        drawEdgeRef, 
+        steps
+    );
+
+    const {
+        moveStepForward,
+        moveStepBackward,
         executeTraversal,
-        endAnimation
-    } = useAlgos(vertices, setVertices, setCurrentCall, edgeCanvasRef, canvasRef, isPaused, drawEdgeRef);
+        currStep
+    } = useController(
+        vertices, 
+        setVertices, 
+        edgeCanvasRef,
+        canvasRef, 
+        drawEdgeRef, 
+        drawVertexRef,
+        isPaused, 
+        setCurrentCall, 
+        steps,
+        stopRequest
+    );
 
     const clearCanvas = () => { // TODO: MOVE TO SEPARATE FILE
         const canvas = canvasRef.current;
@@ -217,15 +248,25 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
         )}
 
         {inputing && (
+            <>
             <InputSearch
             closePopUp={ setInputFalse }
             generateDfsSteps={ generateDfsSteps }
-            executeDfs={ executeTraversal }
+            executeTraversal={ executeTraversal }
             reset={ endAnimation }
             setAlgo={ setAlgo }
+            setCurrStep={ currStep }
             />
+            <button style={{
+                zIndex: 2
+        }} 
+        onClick={ moveStepBackward }>stuff1</button>
+            <button style={{
+                zIndex: 2
+        }} 
+        onClick={ moveStepForward }>stuff2</button>
+            </>
         )}
-
         <canvas 
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}

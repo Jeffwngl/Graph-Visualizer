@@ -17,20 +17,20 @@ export const drawVertex = (ctx: CanvasRenderingContext2D, v: Vertex) => {
 };
 
 export const drawEdge = (
-        ctx: CanvasRenderingContext2D,
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        color: string,
-        lineWidth: number
-    ) => {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
-        ctx.stroke();
+    ctx: CanvasRenderingContext2D,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    color: string,
+    lineWidth: number
+) => {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
 };
 
 export const drawArrow = (
@@ -47,3 +47,14 @@ export const drawArrow = (
     ctx.fillStyle = "black";
     ctx.fill();
 };
+
+export const drawVisitedVertex = (
+    ctx: CanvasRenderingContext2D,
+    v: Vertex
+) => {
+    ctx.beginPath();
+    ctx.arc(v.x, v.y, NODESIZE, 0, Math.PI * 2, false)
+    ctx.strokeStyle = `rgba(76, 245, 93)`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}

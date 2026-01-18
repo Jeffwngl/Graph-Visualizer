@@ -7,7 +7,8 @@ const LINEWIDTH = 6;
 export const circleAnimation = (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     Vertex: Vertex,
-    stopRequest: React.RefObject<boolean>
+    stopRequest: React.RefObject<boolean>,
+    vertexRefs: React.RefObject<Vertex[]>
 ): Promise<void> => {
     return new Promise(resolve => {
         const canvas = canvasRef.current;
@@ -35,6 +36,7 @@ export const circleAnimation = (
                 requestAnimationFrame(animate);
             }
             else {
+                vertexRefs.current.push(Vertex);
                 resolve();
             }
         }
@@ -87,6 +89,7 @@ export const lineAnimation = (
 
         const animate = () => {
             if (stopRequest.current) {
+                console.log("resolved")
                 return resolve();
             }
 

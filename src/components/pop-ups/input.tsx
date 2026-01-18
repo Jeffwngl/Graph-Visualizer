@@ -4,21 +4,23 @@ import './input.css'
 
 type inputProps = {
     closePopUp: () => void;
-    generateDfsSteps: (startVertex: string) => Step[];
-    executeDfs: (steps: Step[]) => void;
+    generateDfsSteps: (startVertex: string) => void;
+    executeTraversal: () => void;
     // dfsIter: (startVertex: string) => void;
     // bfs: () => void;
     // djikstras: () => void;
     reset: () => void;
     setAlgo: React.Dispatch<React.SetStateAction<string>>;
+    setCurrStep: React.RefObject<number>;
 }
 
 export default function InputSearch( {
         closePopUp, 
         generateDfsSteps,
-        executeDfs, 
+        executeTraversal, 
         reset, 
-        setAlgo
+        setAlgo,
+        setCurrStep
     }: inputProps ) {
     const [algorithm, setAlgorithm] = useState<string>("DFSrecursive");
     const [startVertex, setStartVertex] = useState<string>("")
@@ -29,13 +31,17 @@ export default function InputSearch( {
         !isNaN(Number(value)));
     };
 
+    const resetCurrStep = () => {
+        setCurrStep.current = 0;
+    }
+
     const runSearch = () => {
         if (!algorithm || !isNumber(startVertex)) {
             return;
         };
         if (algorithm === "DFSrecursive") {
-            const steps = generateDfsSteps(startVertex.trim());
-            executeDfs(steps);
+            generateDfsSteps(startVertex.trim());
+            executeTraversal();
         } else if (algorithm === "DFSiterative") {
             // TODO: implement iterative version
             return;
@@ -55,6 +61,7 @@ export default function InputSearch( {
             <button className="inputButton" id="inputCloseButton" onClick={ () => {
                 closePopUp();
                 reset();
+                resetCurrStep();
             }}>Close</button>
             <p>Search Algorithm:</p>
             <select name="algorithm" value={algorithm} onChange={e => setAlgorithm(e.target.value)}>
