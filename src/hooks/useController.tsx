@@ -4,7 +4,6 @@ import type { Vertex, Edge, Step } from "../types/graphs.types";
 import { lineAnimation, circleAnimation } from "../animations/Animations";
 import { DELAY, LINECOLOR, SPEED } from "../types/graphs.types";
 import { drawEdge, drawVisitedVertex } from "./useCanvasDraw";
-import { version } from "react-dom/static";
 
 // TODO: Animations don't refresh with skipped step so fix it so that the animation
 // refreshes at the right steps.
