@@ -1,6 +1,8 @@
 # Graph Visualizer
 ## Overview
 This is a project done using HTML canvas (for visualization) + React (for UI) to visualize graph traversal algorithms using the browser, The elements of the graph are drawn on as pixels on the HTML canvas elements and utilizes the useState and useRef features of React to keep track and update information. Animations are done through the animation functions of HTML canvas.
+
+Try it here: https://jeffwngl.github.io/Graph-Visualizer/
 ## Demonstration
 Interface:
 <img width="1661" height="978" alt="Screenshot 2026-01-19 at 6 34 58 PM" src="https://github.com/user-attachments/assets/042b51f3-07b4-44c1-b082-b64328675c12" />
