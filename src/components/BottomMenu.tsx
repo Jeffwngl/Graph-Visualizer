@@ -9,13 +9,13 @@ type bottomMenuProps = {
 export default function BottomMenu({ isPaused }: bottomMenuProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
-    function playPause() {
-        setIsPlaying(!isPlaying);
-    };
+    // function playPause() {
+    //     setIsPlaying(!isPlaying);
+    // };
 
     return (
         <div className="BottomBar">
-            <div className="BottomSpeed">
+            {/* <div className="BottomSpeed">
                 <p>Speed: </p>
                 <select name="speed" id="speed">
                     <option value="1x">1x</option>
@@ -41,7 +41,7 @@ export default function BottomMenu({ isPaused }: bottomMenuProps) {
                     <SkipIcon />
                 </button>
                 <input className="Progress" type="range"></input>
-            </div>
+            </div> */}
             <div className="BottomLinks">
                 <a href="https://github.com/Jeffwngl/Graph-Visualizer">Contribute</a>
             </div>

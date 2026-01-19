@@ -248,7 +248,6 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
         )}
 
         {inputing && (
-            <>
             <InputSearch
             closePopUp={ setInputFalse }
             generateDfsSteps={ generateDfsSteps }
@@ -257,7 +256,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
             setAlgo={ setAlgo }
             setCurrStep={ currStep }
             />
-            <button style={{
+            /* <button style={{
                 zIndex: 2
         }} 
         onClick={ moveStepBackward }>stuff1</button>
@@ -265,7 +264,7 @@ export default function Canvas( {editing, inputing, setEditFalse, setInputFalse,
                 zIndex: 2
         }} 
         onClick={ moveStepForward }>stuff2</button>
-            </>
+            </> */
         )}
         <canvas 
             onMouseDown={handleMouseDown}
